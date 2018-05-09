@@ -1,3 +1,4 @@
+
 package org.cinematics.handlers;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public class Program {
 		boolean done = false;
 		DataManager dataManager = new DataManager();
 		UserInterface ui = new UserInterface();
+		Database db = new Database();
 		setup(dataManager);
 		
 		while(!done) {
@@ -46,6 +48,10 @@ public class Program {
 			case 7:
 				done = true;
 				break;
+			case 8:
+				db.insertOwner();
+				break;
+				
 			default:
 				System.out.println("That is not a valid menu option");
 			}
