@@ -1,0 +1,36 @@
+CREATE SCHEMA cinema;
+
+CREATE TABLE IF NOT EXISTS cinema.movies (
+ id serial primary key not null,
+ name varchar(255) not null,
+ description text not null
+);
+
+CREATE TABLE IF NOT EXISTS cinema.theatres (
+ id serial primary key not null,
+ name varchar(255) not null,
+ seat_rows int not null,
+ seat_cols int not null
+);
+
+CREATE TABLE IF NOT EXISTS cinema.shows (
+ id serial primary key not null,
+ startTime timestamp not null,
+ endtime timestamp not null,
+ movie_id int references cinema.movies not null,
+ theatre_id int references cinema.theatres not null
+);
+
+CREATE TABLE IF NOT EXISTS cinema.customers (
+ id serial primary key not null,
+ name varchar(255) not null,
+ age int
+);
+
+CREATE TABLE IF NOT EXISTS cinema.bookings (
+ id serial primary key not null,
+ show_id serial references cinema.shows not null,
+ seat_row int not null,
+ seat_col int not null,
+ customer_id int references cinema.customers
+);
