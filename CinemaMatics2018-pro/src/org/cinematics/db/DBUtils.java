@@ -7,10 +7,11 @@ public class DBUtils {
 
     private static Connection connection;
     
+    
     //THESE VALUES HAVE TO BE MODIFIED FOR YOUR DATABASE 
     private static String driverName = "org.postgresql.Driver";
     private static String dbAdress = "jdbc:postgresql://127.0.0.1:5432/postgres";
-    private static String userName = "elev";
+    private static String userName = "postgres";
     private static String password = "";
     
     public static Connection getConnection() {
@@ -20,7 +21,7 @@ public class DBUtils {
                 return connection;
             }
         }
-        return null;
+        return connection;
     }
     
     public static boolean closeConnection() {

@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS cinema.theatres (
 
 CREATE TABLE IF NOT EXISTS cinema.shows (
  id serial primary key not null,
- startTime timestamp not null,
+ starttime timestamp not null,
  endtime timestamp not null,
  movie_id int references cinema.movies not null,
  theatre_id int references cinema.theatres not null

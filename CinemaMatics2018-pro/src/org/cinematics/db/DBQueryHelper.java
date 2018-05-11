@@ -7,10 +7,9 @@ import java.util.Optional;
 
 public class DBQueryHelper {
     
-    public static Optional<ResultSet> executePreparedStatementQuery(String querySQL, Object... values) {
-        Connection connection = DBUtils.getConnection();
-        
-        try {
+    public static Optional<ResultSet> prepareAndExecuteStatementQuery(String querySQL, Object... values) {
+               
+        try ( Connection connection = DBUtils.getConnection() ){
             PreparedStatement stmt = connection.prepareStatement(querySQL);
             for(int i = 0; i < values.length; i++) {
                 stmt.setObject(i+1, values[i]);
@@ -21,14 +20,12 @@ public class DBQueryHelper {
         } catch (SQLException e) {
             System.err.println(e);
             return Optional.empty();
-        } finally {
-            DBUtils.closeConnection();
         }    
     }
     
-    public static long executePreparedStatementUpdate(String updateSQL, Object... values) {
-        Connection connection = DBUtils.getConnection();
-        try {
+    public static long prepareAndExecuteStatementUpdate(String updateSQL, Object... values) {
+        
+        try ( Connection connection = DBUtils.getConnection() ) {
             PreparedStatement stmt = connection.prepareStatement(updateSQL);
             for(int i = 0; i < values.length; i++) {
                 stmt.setObject(i+1, values[i]);
@@ -39,8 +36,6 @@ public class DBQueryHelper {
         } catch (SQLException e) {
             System.err.println(e);
             return 0;
-        } finally {
-            DBUtils.closeConnection();
         }
     }
     
