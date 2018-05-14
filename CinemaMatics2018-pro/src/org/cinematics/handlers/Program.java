@@ -10,12 +10,14 @@ import org.cinematics.model.Movie;
 import org.cinematics.model.Seat;
 import org.cinematics.model.Show;
 import org.cinematics.model.Theatre;
+import java.sql.Connection;
 
 public class Program {
 
 	public static void main(String[] args) {
 		boolean done = false;
 		DataManager dataManager = new DataManager();
+		DataBaseHandler  myDbHandler = new DataBaseHandler();
 		UserInterface ui = new UserInterface();
 		setup(dataManager);
 		
@@ -45,6 +47,12 @@ public class Program {
 				break;
 			case 7:
 				done = true;
+				break;
+				
+			case 8:
+				myDbHandler.addCustomer(2, "kunden2");
+				
+				
 				break;
 			default:
 				System.out.println("That is not a valid menu option");

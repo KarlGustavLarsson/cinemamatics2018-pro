@@ -17,6 +17,7 @@ import org.cinematics.model.Theatre;
  * 
  *
  */
+//TEST
 public class DataManager {
 	
 	private Map<String, Theatre> theatres;
@@ -31,6 +32,7 @@ public class DataManager {
 	
 	public Theatre getTheatre(String name) {
 		return theatres.get(name);
+	
 	}
 	
 	public Set<Movie> getAllMovies(){
