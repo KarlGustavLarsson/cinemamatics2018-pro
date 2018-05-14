@@ -1,6 +1,5 @@
 package org.cinematics.model;
 
-import org.cinematics.handlers.DataManager;
 
 public class Booking {
 	
@@ -19,8 +18,8 @@ public class Booking {
 		this.showID = showID;
 	}
 	
-	public Show getShow() {
-		return DataManager.getShowFromID(showID);
+	public Integer getShowID() {
+		return showID;
 	}
 	
 	public void setBookingId(Integer showID) {

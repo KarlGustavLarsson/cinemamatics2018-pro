@@ -71,7 +71,7 @@ public class Program {
 		dataManager.addTheatre(new Theatre("Salong4"));
 
 		Show show = new Show(LocalDateTime.now(), LocalDateTime.now(), m1.getId());
-		dataManager.addShowToTheatre(show, "Salong1");
+		dataManager.addShowToTheatre(show, m1.getId(),"Salong1");
 	}
 
 	public static void addMovie(DataManager dataManager) {
@@ -115,7 +115,7 @@ public class Program {
 			System.out.println("Choice "+choice+" please");
 			for (Theatre cT : dataManager.getTheatres()) {
 				
-				for(Show show : cT.getAllShows()) {
+				for(Show show : dataManager.getAllShows(cT.getName())) {
 					System.out.println(show.toString());
 					show.showAllSeats();
 				}
@@ -127,7 +127,7 @@ public class Program {
 				System.out.println("No such show id");
 				break;
 			}
-			Show show = theatre.getShow(showId);
+			Show show = dataManager.getShowFromID(showId);
 
 			int numberOfSeats = UserInterface.chooseNumberOfSeats();
 			if(numberOfSeats == Integer.MIN_VALUE) return;
@@ -257,7 +257,7 @@ public class Program {
 			System.out.println("Start time must be strictly before end time");
 			return;
 		}
-		List<Show> shows = theatre.getAllShows();
+		List<Show> shows = dataManager.getAllShows(theatre.getName());
 		List<Show> overlappingShows = new ArrayList<Show>();
 		for(Show currentShow : shows) {
 			if(currentShow.checkOverlap(startTime, endTime)) {
@@ -273,7 +273,7 @@ public class Program {
 		show.setStart(startTime);
 		show.setEnd(endTime);
 		
-		if( !dataManager.addShowToTheatre(show, chosenTheatre))
+		if( !dataManager.addShowToTheatre(show, movieId, chosenTheatre))
 			System.out.println("Could not add show to DB.");
 	}
 
@@ -285,11 +285,11 @@ public class Program {
 			System.out.println("That theatre does not exist.");
 			return;
 		}
-		if(cT.getAllShows().isEmpty()) {
+		if(dataManager.getAllShows(cT.getName()).isEmpty()) {
 			System.out.println("There are no shows");
 			return;
 		}
-		for(Show show : cT.getAllShows()) {
+		for(Show show : dataManager.getAllShows(cT.getName())) {
 			System.out.println(show.toString());
 		}
 		
@@ -299,7 +299,7 @@ public class Program {
 		System.out.println("All shows:");
 		for (Theatre cT : dataManager.getTheatres()) {
 			System.out.println("-"+cT.toString());
-			for(Show show : cT.getAllShows()) {
+			for(Show show : dataManager.getAllShows(cT.getName())) {
 				System.out.println("---"+show.toString());
 			}
 			System.out.println("");

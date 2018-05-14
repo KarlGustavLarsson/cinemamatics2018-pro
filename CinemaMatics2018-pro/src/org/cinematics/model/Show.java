@@ -69,6 +69,10 @@ public class Show implements Comparable <Show>{
 		return bookings;
 	}
 
+	public Integer getMovieID() {
+		return movieID;
+	}
+	
 	public boolean checkOverlap(LocalDateTime startTime, LocalDateTime endTime) {
 		return (start.isBefore(endTime) && startTime.isBefore(end));
 	}
@@ -101,27 +105,7 @@ public class Show implements Comparable <Show>{
 		this.end = end;
 	}
 	
-	/**
-	 * @return the movieID
-	 */
-	public Movie getMovieID() {
-		
-		String movieQuery = "SELECT * FROM cinema.movies WHERE id = ?";
-		try {
-			ResultSet result = DBQueryHelper.prepareAndExecuteStatementQuery(movieQuery, movieID).get();
-			Movie movie;
-			if(result.next()) {
-				movie = new Movie();
-				movie.setId(result.getInt("id"));
-				movie.setName(result.getString("name"));
-				movie.setDescription(result.getString("description"));
-				return movie;
-			}
-		} catch (SQLException e) {
-			System.err.println(e);
-		}
-		return null;
-	}
+	
 	
 	/**
 	 * @param movieID the movieID to set
@@ -152,7 +136,7 @@ public class Show implements Comparable <Show>{
 		 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm");
 		 String startTime = formatter.format(start);
 		 String endTime = formatter.format(end);
-		 return "ShowId:" + this.id  + " Namn:" + this.getMovieID().getName() + " Start:" + startTime + " Slut:" + endTime; 
+		 return "ShowId:" + this.id  + " Namn:" + this.getMovieID() + " Start:" + startTime + " Slut:" + endTime; 
 	 }
 	
 	public void showAllSeats() {

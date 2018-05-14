@@ -101,7 +101,7 @@ public class DataManager {
 	}
 
 	// TODO DB, DeGlobalize Theatres
-	public boolean addShowToTheatre(Show show, String theatreName) {
+	public boolean addShowToTheatre(Show show, Integer movieID, String theatreName) {
 
 		String getAllTheatres = "SELECT * FROM cinema.shows INNER JOIN cinema.theatres ON theatres.id=shows.theatre_id WHERE name = ?;";
 
@@ -133,7 +133,7 @@ public class DataManager {
 		String showInsert = "INSERT INTO cinema.shows (starttime, endtime, movie_id, theatre_id) VALUES (?,?,?,?);";
 
 		long updRes = DBQueryHelper.prepareAndExecuteStatementUpdate(showInsert, show.getStart(), show.getEnd(),
-				show.getMovieID(), theatreID);
+				getMovie(movieID).getId(), theatreID);
 
 		return updRes > 0;
 	}
@@ -175,6 +175,25 @@ public class DataManager {
 		return null;
 	}
 
+	public Movie getMovie(Integer movieID) {
+		
+		String movieQuery = "SELECT * FROM cinema.movies WHERE id = ?";
+		try {
+			ResultSet result = DBQueryHelper.prepareAndExecuteStatementQuery(movieQuery, movieID).get();
+			Movie movie;
+			if(result.next()) {
+				movie = new Movie();
+				movie.setId(result.getInt("id"));
+				movie.setName(result.getString("name"));
+				movie.setDescription(result.getString("description"));
+				return movie;
+			}
+		} catch (SQLException e) {
+			System.err.println(e);
+		}
+		return null;
+	}	
+	
 	public Theatre getTheatreForShow(Integer showId) {
 		String getTheatreForShowQuery = "SELECT * FROM cinema.theatres INNER JOIN cinema.shows ON"
 				+ " (theatres.id = shows.theatre_id) WHERE shows.id=?;";
@@ -223,7 +242,28 @@ public class DataManager {
 		return -1;
 	}
 
-	public static Show getShowFromID(Integer showID) {
+	public List<Show> getAllShows(String theatreName) {
+		String getAllShowsQuery = "SELECT * FROM cinema.shows INNER JOIN cinema.theatres ON theatres.id=shows.theatre_id WHERE name = ?;";
+		List<Show> shows = new ArrayList<>();
+
+		try {
+			ResultSet rs = DBQueryHelper.prepareAndExecuteStatementQuery(getAllShowsQuery,theatreName).get();
+			Show show;
+			while(rs.next()) {
+				show = new Show();
+				show.setId(rs.getInt("id"));
+				show.setMovieID(rs.getInt("movie_id"));
+				show.setStart(rs.getTimestamp("starttime").toLocalDateTime());
+				show.setEnd(rs.getTimestamp("endtime").toLocalDateTime());
+				shows.add(show);
+			}
+		} catch (SQLException e) {
+			System.err.println(e);
+		}
+		return shows;
+	}
+	
+	public Show getShowFromID(Integer showID) {
 		String showQuery = "SELECT * FROM cinema.shows WHERE id = ?";
 		try {
 			Optional<ResultSet> rso = DBQueryHelper.prepareAndExecuteStatementQuery(showQuery, showID);
