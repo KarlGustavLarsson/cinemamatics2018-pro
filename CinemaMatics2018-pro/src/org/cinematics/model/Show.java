@@ -1,36 +1,33 @@
 package org.cinematics.model;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cinematics.db.DBQueryHelper;
 import org.cinematics.exceptions.OutOfSeatingBoundsException;
 
 // Describes a show in the theatre, Start, End and Movie
 
 public class Show implements Comparable <Show>{
 	
-	private static int ID_COUNTER = 1;
 	private Integer id; 
 	private LocalDateTime start;
 	private LocalDateTime end;
-	private Movie movie;
-	private Booking[][] bookings = new Booking[Theatre.SEAT_ROWS][Theatre.SEAT_COLS];	// The seating arrangement
-
+	private Integer movieID;
+		// The seating arrangement
+	
 	public Show() {
-		id = ID_COUNTER;
-		ID_COUNTER++;
 		
 	}
 	
-	public Show(LocalDateTime start, LocalDateTime end, Movie movie) {
+	public Show(LocalDateTime start, LocalDateTime end, Integer movie) {
 		this.start = start;
 		this.end = end;
-		this.movie = movie;
-		
-		id = ID_COUNTER;
-		ID_COUNTER++;
+		this.movieID = movie;
 	}
 	
 	//Make this object sortable in an arraylist
@@ -50,6 +47,24 @@ public class Show implements Comparable <Show>{
 	}
 	
 	public Booking[][] getBookings() {
+		Booking[][] bookings = new Booking[Theatre.SEAT_ROWS][Theatre.SEAT_COLS];
+		String bookingsQuery = "SELECT * FROM cinema.bookings WHERE show_id = ?";
+		ResultSet rs = DBQueryHelper.prepareAndExecuteStatementQuery(bookingsQuery, id).get();
+		try {
+			Booking booking;
+			int row;
+			int col;
+			while(rs.next()) {
+				booking = new Booking();
+				row = rs.getInt("seat_row");
+				col = rs.getInt("seat_col");
+				booking.setShowID(this.id);
+				booking.setBookingId(rs.getInt("id"));
+				booking.setCustomerID(rs.getInt("customer_id"));
+				bookings[row][col] = booking;
+			}
+		} catch (SQLException e) {
+			System.err.println(e);		}
 		return bookings;
 	}
 
@@ -86,17 +101,32 @@ public class Show implements Comparable <Show>{
 	}
 	
 	/**
-	 * @return the movie
+	 * @return the movieID
 	 */
-	public Movie getMovie() {
-		return movie;
+	public Movie getMovieID() {
+		
+		String movieQuery = "SELECT * FROM cinema.movies WHERE id = ?";
+		ResultSet result = DBQueryHelper.prepareAndExecuteStatementQuery(movieQuery, movieID).get();
+		try {
+			Movie movie;
+			if(result.next()) {
+				movie = new Movie();
+				movie.setId(result.getInt("id"));
+				movie.setName(result.getString("name"));
+				movie.setDescription(result.getString("description"));
+				return movie;
+			}
+		} catch (SQLException e) {
+			System.err.println(e);
+		}
+		return null;
 	}
 	
 	/**
-	 * @param movie the movie to set
+	 * @param movieID the movieID to set
 	 */
-	public void setMovie(Movie movie) {
-		this.movie = movie;
+	public void setMovieID(Integer movieID) {
+		this.movieID = movieID;
 	}
 	
 
@@ -121,7 +151,7 @@ public class Show implements Comparable <Show>{
 		 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm");
 		 String startTime = formatter.format(start);
 		 String endTime = formatter.format(end);
-		 return "ShowId:" + this.id  + " Namn:" + this.movie.getName() + " Start:" + startTime + " Slut:" + endTime; 
+		 return "ShowId:" + this.id  + " Namn:" + this.getMovieID().getName() + " Start:" + startTime + " Slut:" + endTime; 
 	 }
 	
 	public void showAllSeats() {
@@ -134,6 +164,7 @@ public class Show implements Comparable <Show>{
 			System.out.print("--");
 		}
 		System.out.println("-");
+		Booking[][] bookings = getBookings();
 		for(int row = 0; row < bookings.length; row++) {
 			System.out.print(row+"|");
 			for(int col = 0; col < bookings[row].length; col++) {
@@ -151,20 +182,21 @@ public class Show implements Comparable <Show>{
 
 	public void showTickets(Booking booking) {
 		List<Seat> bookedSeats = new ArrayList<Seat>();
+		Booking[][] bookings = getBookings();
 		for(int row = 0; row < bookings.length; row++) {
 			for(int col = 0; col < bookings[row].length; col++) {
 				Booking seatInTheatre = bookings[row][col];
 				if(seatInTheatre == null) {
 					continue;
 				}
-				if(booking.getBookingId() == seatInTheatre.getBookingId()) {
+				if(booking.getCustomerID() == seatInTheatre.getCustomerID()) {
 					bookedSeats.add(new Seat(row,col));	
 				}
 			}
 		}
 		System.out.println("----Ticket----");
 		System.out.println("Booking id: "+booking.getBookingId());
-		System.out.println(booking.getShow().toString());
+		//System.out.println(booking.getShow().toString());
 		System.out.print("Seats: ");
 		bookedSeats.forEach(seat -> {
 			System.out.print("(row: "+seat.row+", column: "+seat.col+")"+ " ");
@@ -197,7 +229,7 @@ public class Show implements Comparable <Show>{
 		if(col >= Theatre.SEAT_COLS || col < 0) {
 			throw new OutOfSeatingBoundsException("Col out of bounds");
 		}
-		return (bookings[row][col] == null);
+		return (getBookings()[row][col] == null);
 	}
 
 }

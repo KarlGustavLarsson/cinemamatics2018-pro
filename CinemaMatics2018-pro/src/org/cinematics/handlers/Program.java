@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.cinematics.db.DBUtils;
 import org.cinematics.exceptions.OutOfSeatingBoundsException;
 import org.cinematics.model.Booking;
 import org.cinematics.model.Movie;
@@ -45,6 +46,7 @@ public class Program {
 				break;
 			case 7:
 				done = true;
+				DBUtils.closeConnection();
 				break;
 			default:
 				System.out.println("That is not a valid menu option");
@@ -68,7 +70,7 @@ public class Program {
 		dataManager.addTheatre(new Theatre("Salong3"));
 		dataManager.addTheatre(new Theatre("Salong4"));
 
-		Show show = new Show(LocalDateTime.now(), LocalDateTime.now(), m1);
+		Show show = new Show(LocalDateTime.now(), LocalDateTime.now(), m1.getId());
 		dataManager.addShowToTheatre(show, "Salong1");
 	}
 
@@ -108,6 +110,7 @@ public class Program {
 	public static void makeBooking(DataManager dataManager, Integer choice) {
 		boolean doneWithBooking = false; 
 		while(!doneWithBooking) {
+			int customerID = dataManager.createCustomer(""); //customer id added to separate bookings
 			//Choose show
 			System.out.println("Choice "+choice+" please");
 			for (Theatre cT : dataManager.getTheatres()) {
@@ -150,10 +153,12 @@ public class Program {
 				try {
 					if(show.areSeatsAvailable(seats)) {
 						Booking booking = new Booking();
-						booking.setShow(show);
+						booking.setShowID(show.getId());
+						booking.setCustomerID(customerID);
 						for(Seat currentSeat : seats) {
 							dataManager.saveBooking(booking, currentSeat.row, currentSeat.col, show.getId(), theatre.getName());
 						}
+						System.out.println("Booking succeeded");
 						show.showAllSeats();
 						show.showTickets(booking);
 						break;
@@ -192,10 +197,12 @@ public class Program {
 					}
 				}
 				Booking booking = new Booking();
-				booking.setShow(show);
+				booking.setCustomerID(customerID);
+				booking.setShowID(show.getId());
 				for(Seat currentSeat : seats) {
 					dataManager.saveBooking(booking, currentSeat.row, currentSeat.col, show.getId(), theatre.getName());
 				}
+				
 				System.out.println("Booking succeeded");
 				show.showAllSeats();
 				show.showTickets(booking);
@@ -215,12 +222,11 @@ public class Program {
 		if(movieId == Integer.MIN_VALUE) return;
 		for(Movie movie : movies) {
 			if(movie.getId() == movieId) {
-				Movie showMovie = movie;
-				show.setMovie(showMovie);
+				show.setMovieID(movie.getId());
 				break;
 			}
 		}
-		if(show.getMovie() == null) {
+		if(show.getMovieID() == null) {
 			System.out.println("That movie id does not exist");
 			return;
 		}

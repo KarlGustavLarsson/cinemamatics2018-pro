@@ -7,9 +7,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.cinematics.db.DBQueryHelper;
@@ -23,16 +22,6 @@ import org.cinematics.model.Theatre;
 *
 */
 public class DataManager {
-    
-    //private Map<String, Theatre> theatres;
-    private Map<Integer, Booking> bookings;
-    //private Set<Movie> movies;
-    
-    public DataManager() {
-        //theatres = new TreeMap<String, Theatre>();
-        bookings = new TreeMap<Integer, Booking>();
-        //movies = new TreeSet<Movie>(Comparator.comparing(Movie::getName));
-    }
     
     // Place to improve database connectivity
     // Get specific row from entity;
@@ -112,21 +101,6 @@ public class DataManager {
     
     //TODO DB, DeGlobalize Theatres
     public boolean addShowToTheatre(Show show, String theatreName) {
-    	// Map<String, Theatre> theatres = new TreeMap<String, Theatre>();
-    	
-    	// Theatre t = getTheatre(theatreName); 
-    	
-    	// show.checkOverlap
-    	// TIMESTAMP [ WITHOUT TIMEZONE ]	LocalDateTime
-    	// Get all SQL start/end dates
-    	// Check overlap
-    	// add show
-    	
-    	
-    	// theatre_name -> theatre_id
-    	// SELECT * FROM cinema.shows INNER JOIN cinema.theatres ON theatres.id=shows.theatre_id WHERE name = 'Salong 1';
-    	
-        //String getAllTheatres = "SELECT * FROM cinema.shows INNER JOIN cinema.theatres on theatre_id=id where theatre=?;";
     	
     	String getAllTheatres = "SELECT * FROM cinema.shows INNER JOIN cinema.theatres ON theatres.id=shows.theatre_id WHERE name = ?;";
     	
@@ -161,7 +135,7 @@ public class DataManager {
         long updRes = DBQueryHelper.prepareAndExecuteStatementUpdate(showInsert, 
         		show.getStart(),
         		show.getEnd(),
-        		show.getMovie().getId(),
+        		show.getMovieID(),
         		theatreID);
         
         return updRes > 0;
@@ -169,34 +143,48 @@ public class DataManager {
     
     
     //TODO DB, DeGlobalize Theatres
-    public boolean saveBooking(Booking booking, Integer row, Integer col, Integer showId, String theatreName) {
-    	Map<String, Theatre> theatres = new TreeMap<String, Theatre>();
-    	
-        if(theatres.containsKey(theatreName)) {
-            Theatre theatre = theatres.get(theatreName);
-            Show show = theatre.getShow(showId);
-            show.getBookings()[row][col] = booking;
-            bookings.put(booking.getBookingId(), booking);
-            return true;
-        }
-        return false;
+    public ResultSet saveBooking(Booking booking, Integer row, Integer col, Integer showId, String theatreName) {
+    	String checkIfSeatTakenQuery = "SELECT * FROM cinema.bookings"
+    			+ " WHERE show_id = ? AND seat_row = ? AND seat_col = ?;";
+    	Optional<ResultSet> rso = DBQueryHelper.prepareAndExecuteStatementQuery(
+    			checkIfSeatTakenQuery, showId, row, col);
+    	if(!rso.isPresent()) {
+    		return null;
+    	}
+    	ResultSet rs = rso.get();
+    	try {
+			if(rs.next()) {
+				return null;
+			}
+		} catch (SQLException e) {
+			System.err.println(e);
+		}
+    	String insertBookingQuery = "INSERT INTO cinema.bookings "
+    			+ "(show_id, seat_row, seat_col, customer_id) VALUES (?,?,?,?);";
+    	ResultSet rsWithKeys = DBQueryHelper.prepareAndExecuteStatementUpdateReturnKeys(
+    			insertBookingQuery, showId, row, col, booking.getCustomerID());
+        return rsWithKeys;
     }
     
     public Theatre getTheatreForShow(Integer showId) {
-        for(Theatre theatre : getTheatres()) {
-            for(Show show : theatre.getAllShows()) {
-                if(show.getId() == showId) {
-                    return theatre;
-                }
-            }
-        }
+    	String getTheatreForShowQuery = "SELECT * FROM cinema.theatres INNER JOIN cinema.shows ON"
+    			+ " (theatres.id = shows.theatre_id) WHERE shows.id=?;";
+    	Optional<ResultSet> rso = DBQueryHelper.prepareAndExecuteStatementQuery(getTheatreForShowQuery, showId);
+    	if(!rso.isPresent()) {
+    		return null;
+    	}
+    	ResultSet rs = rso.get();
+    	try {
+			if(rs.next()) {
+				String name = rs.getString("name");
+				Theatre theatre = new Theatre(name);
+				theatre.setId(rs.getInt("id"));
+				return theatre;
+			}
+		} catch (SQLException e) {
+			System.err.println(e);
+		}
         return null;
-    }
-    
-    //TODO DB    
-    public Booking getBooking(Integer bookingId) {
-        
-        return bookings.get(bookingId);
     }
     
     // Check if ROW exists in ENTITY
@@ -212,4 +200,40 @@ public class DataManager {
         }
         return false;
     }
+    
+    public int createCustomer(String name) {
+    	String insertBookingQuery = "INSERT INTO cinema.customers (name) VALUES (?);";
+    	ResultSet rsWithKeys = DBQueryHelper.prepareAndExecuteStatementUpdateReturnKeys(insertBookingQuery, name);
+    	try {
+    		if(rsWithKeys.next())
+    			return rsWithKeys.getInt(1);
+		} catch (SQLException e) {
+			System.err.println(e);
+		}
+    	return -1;
+    }
+    
+    public static Show getShowFromID(Integer showID) {
+		String showQuery = "SELECT * FROM cinema.shows WHERE id = ?";
+		Optional<ResultSet> rso = DBQueryHelper.prepareAndExecuteStatementQuery(showQuery, showID);
+		if(!rso.isPresent()) {
+			return null;
+		}
+		try {
+			ResultSet rs = rso.get();
+			if(rs.next()) {
+				Show show = new Show();
+				show.setId(rs.getInt("id"));
+				show.setMovieID(rs.getInt("movie_id"));
+				show.setStart(rs.getTimestamp("starttime").toLocalDateTime());
+				show.setEnd(rs.getTimestamp("endtime").toLocalDateTime());
+				return show;
+			}
+		} catch (SQLException e) {
+			System.err.println(e);
+		}
+		return null;
+	}
+   
+
 }

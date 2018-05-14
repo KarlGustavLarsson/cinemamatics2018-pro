@@ -1,29 +1,30 @@
 package org.cinematics.model;
 
+import org.cinematics.handlers.DataManager;
+
 public class Booking {
 	
-	private static int BOOKING_COUNTER = 0;
 	private int bookingId;
-	private Customer myCust;
-	private Show myShow;
-	
-	public Booking() {
-		bookingId = BOOKING_COUNTER;
-		BOOKING_COUNTER++;
-	}
+	private Integer customerID;
+	private Integer showID;
 		
-	public void setCustomer(Customer c) {
-		myCust = c;
+	public void setCustomerID(Integer id) {
+		customerID = id;
 	}
-	public Customer getCustomer() {
-		return myCust;
+	public Integer getCustomerID() {
+		return customerID;
 	}
 	
-	public void setShow(Show s) {
-		myShow = s;
+	public void setShowID(Integer showID) {
+		this.showID = showID;
 	}
+	
 	public Show getShow() {
-		return myShow;
+		return DataManager.getShowFromID(showID);
+	}
+	
+	public void setBookingId(Integer showID) {
+		this.showID = showID;
 	}
 	
 	public int getBookingId() {

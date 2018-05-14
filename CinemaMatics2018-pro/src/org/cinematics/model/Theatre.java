@@ -1,6 +1,11 @@
 package org.cinematics.model;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.cinematics.db.DBQueryHelper;
+import org.cinematics.handlers.DataManager;
 
 // Describes the Theatre studio where the movie is shown
 
@@ -8,23 +13,32 @@ public class Theatre {
 	private transient int id;
 	public static int SEAT_ROWS = 5;
 	public static int SEAT_COLS = 10;
-	private String name;						// The studio might have a name like "Blue Room"
-	private List<Show> shows;					// The show that is booked for the studio
+	private String name;						// The studio might have a name like "Blue Room"				// The show that is booked for the studio
 
 
 	// Constructor
 	public Theatre(String name) {
 		this.name = name;
-		shows = new ArrayList<>();
 	}
 
 	public List<Show> getAllShows() {
+		String getAllShowsQuery = "SELECT * FROM cinema.shows INNER JOIN cinema.theatres ON theatres.id=shows.theatre_id WHERE name = ?;";
+		ResultSet rs = DBQueryHelper.prepareAndExecuteStatementQuery(getAllShowsQuery,name).get();
+		List<Show> shows = new ArrayList<>();
+		try {
+			Show show;
+			while(rs.next()) {
+				show = new Show();
+				show.setId(rs.getInt("id"));
+				show.setMovieID(rs.getInt("movie_id"));
+				show.setStart(rs.getTimestamp("starttime").toLocalDateTime());
+				show.setEnd(rs.getTimestamp("endtime").toLocalDateTime());
+				shows.add(show);
+			}
+		} catch (SQLException e) {
+			System.err.println(e);
+		}
 		return shows;
-	}
-
-	
-	public void addShow(Show s) {
-		shows.add(s);
 	}
 
 	/**
@@ -41,24 +55,12 @@ public class Theatre {
 	}
 	
 	/**
-	 * @return the show
+	 * @return the show associated with this theatre id
 	 */
-	public Show getShow(Integer id) {
-		for(Show show : shows) {
-			if(show.getId() == id) {
-				return show;
-			}
-		}
-		return null;
+	public Show getShow(Integer showID) {
+		return DataManager.getShowFromID(showID);
 	}
-	/**
-	 * @param show the show to set
-	 */
-	
-	public List<Show> getAllShowsInTheatre() {
-		return shows;
-	}
-	
+
 	@Override
 	public String toString() {
 		return name;
