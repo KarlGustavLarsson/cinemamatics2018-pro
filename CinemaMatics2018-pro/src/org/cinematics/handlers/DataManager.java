@@ -135,7 +135,7 @@ public class DataManager {
         long updRes = DBQueryHelper.prepareAndExecuteStatementUpdate(showInsert, 
         		show.getStart(),
         		show.getEnd(),
-        		show.getMovieID(),
+        		show.getMovieID().getId(),
         		theatreID);
         
         return updRes > 0;
