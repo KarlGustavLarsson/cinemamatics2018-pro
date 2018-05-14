@@ -5,9 +5,15 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import org.cinematics.model.Customer;
+import org.cinematics.model.Movie;
+import org.cinematics.model.Show;
 
 public class DataBaseHandler {
 	Connection conn;
@@ -31,7 +37,7 @@ public class DataBaseHandler {
 
         }
     }
-
+    
     private void open() {
         try {
 
@@ -57,7 +63,109 @@ public class DataBaseHandler {
         }
     }
 
+   
+    public List<Show> loadShowFromDb() {
+    	List<Show> shows = new ArrayList<>();
+    	
+    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    	
+    	
+    	
+    	open();
+        try {
+            String query =
+                    "SELECT * FROM show";
+            
+            // execute query
 
+            Statement statement = conn.createStatement ();
+
+            ResultSet rs = statement.executeQuery (query);
+            
+            
+            while ( rs.next () ){
+            	
+            	LocalDateTime startT = LocalDateTime.parse((rs.getString("starttime")), formatter);
+            	LocalDateTime endT = LocalDateTime.parse((rs.getString("endtime")), formatter);
+            	Show showToAdd = new Show(rs.getInt("id"), startT, endT, getMovie(rs.getInt("movie_id")));
+            			
+            	shows.add(showToAdd);
+            	
+            }
+
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+        } finally {
+            close();
+        }
+        return shows;
+    	
+    }
+    public Movie getMovie(int movieId) {
+    	Movie retMovie = new Movie();
+    	
+    	open();
+        try {
+            String query =
+                    "SELECT * FROM movie WHERE id = " + movieId;
+            
+            // execute query
+
+            Statement statement = conn.createStatement ();
+
+            ResultSet rs = statement.executeQuery (query);
+            
+            
+            retMovie.setMovieIdCounter(rs.getInt("id"));
+            retMovie.setName(rs.getString("name"));
+            retMovie.setDescription(rs.getString("decription"));
+            
+            
+           
+
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+        } finally {
+            close();
+        }
+        return retMovie;
+    }
+    public List<Movie> getAllMoviesFromDb(){
+    	List<Movie> movies = new ArrayList<>();
+
+    	open();
+        try {
+            String query =
+                    "SELECT * FROM movie";
+            
+            // execute query
+
+            Statement statement = conn.createStatement ();
+
+            ResultSet rs = statement.executeQuery (query);
+            
+            
+            while ( rs.next () ){
+            	
+            	
+            	Movie movieToAdd = new Movie();
+            	movieToAdd.setId(rs.getInt("id"));
+            	movieToAdd.setName(rs.getString("name"));
+            	movieToAdd.setDescription(rs.getString("decription"));
+            			
+            	movies.add(movieToAdd);
+            }
+
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+        } finally {
+            close();
+        }
+        return movies;
+    	
+    }
+    
+    
     public void addCustomer(int id, String n){
         open();
         try {

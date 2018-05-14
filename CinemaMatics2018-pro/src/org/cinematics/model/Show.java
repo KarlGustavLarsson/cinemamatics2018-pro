@@ -6,11 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cinematics.exceptions.OutOfSeatingBoundsException;
+import org.cinematics.handlers.DataBaseHandler;
 
 // Describes a show in the theatre, Start, End and Movie
 
 public class Show implements Comparable <Show>{
 	
+	
+	
+
 	private static int ID_COUNTER = 1;
 	private Integer id; 
 	private LocalDateTime start;
@@ -31,6 +35,13 @@ public class Show implements Comparable <Show>{
 		
 		id = ID_COUNTER;
 		ID_COUNTER++;
+	}
+	
+	public Show(int id, LocalDateTime start, LocalDateTime end, Movie movie) {
+		this.id = id;
+		this.start = start;
+		this.end = end;
+		this.movie = movie;
 	}
 	
 	//Make this object sortable in an arraylist

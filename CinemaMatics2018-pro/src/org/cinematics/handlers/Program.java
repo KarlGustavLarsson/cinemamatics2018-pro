@@ -50,8 +50,9 @@ public class Program {
 				break;
 				
 			case 8:
-				myDbHandler.addCustomer(3, "ture");
-				System.out.println(myDbHandler.getCustomer(3).getName());
+				System.out.println(myDbHandler.loadShowFromDb().get(1).getEnd());
+				//myDbHandler.addCustomer(3, "ture");
+				//System.out.println(myDbHandler.getCustomer(3).getName());
 				
 				break;
 			default:
@@ -64,18 +65,20 @@ public class Program {
 		Movie m1 = new Movie();
 		m1.setName("Terminator");
 		m1.setDescription("I'll be back");
-		
-		Movie m2 = new Movie();
-		m2.setName("Scarface");
-		m2.setDescription("Say hello to my....");
-		
-		dataManager.addMovie(m1);
-		dataManager.addMovie(m2);
-		dataManager.addTheatre(new Theatre("Salong1"));
-		dataManager.addTheatre(new Theatre("Salong2"));
-		dataManager.addTheatre(new Theatre("Salong3"));
-		dataManager.addTheatre(new Theatre("Salong4"));
+//		
+//		Movie m2 = new Movie();
+//		m2.setName("Scarface");
+//		m2.setDescription("Say hello to my....");
+//		
+//		dataManager.addMovie(m1);
+//		dataManager.addMovie(m2);
+//		dataManager.addTheatre(new Theatre("Salong1"));
+//		dataManager.addTheatre(new Theatre("Salong2"));
+//		dataManager.addTheatre(new Theatre("Salong3"));
+//		dataManager.addTheatre(new Theatre("Salong4"));
 
+		
+		//remember to fix this... movieId
 		Show show = new Show(LocalDateTime.now(), LocalDateTime.now(), m1);
 		dataManager.addShowToTheatre(show, "Salong1");
 	}
@@ -224,11 +227,11 @@ public class Program {
 		for(Movie movie : movies) {
 			if(movie.getId() == movieId) {
 				Movie showMovie = movie;
-				show.setMovie(showMovie);
+				show.setMovie(showMovie.getMovieIdCounter());
 				break;
 			}
 		}
-		if(show.getMovie() == null) {
+		if(show.getMovieId() != ) {
 			System.out.println("That movie id does not exist");
 			return;
 		}

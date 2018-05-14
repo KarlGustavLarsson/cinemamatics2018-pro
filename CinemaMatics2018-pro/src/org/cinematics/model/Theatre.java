@@ -2,9 +2,14 @@ package org.cinematics.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cinematics.handlers.DataBaseHandler;
+
 // Describes the Theatre studio where the movie is shown
 
 public class Theatre {
+	
+	
+	
 	public static int SEAT_ROWS = 5;
 	public static int SEAT_COLS = 10;
 	private String name;						// The studio might have a name like "Blue Room"
@@ -21,6 +26,12 @@ public class Theatre {
 		return shows;
 	}
 
+	public void loadShowFromDb() {
+		
+		DataBaseHandler dbH = new DataBaseHandler();
+		Show showToAdd = new Show();
+		
+	}
 	
 	public void addShow(Show s) {
 		shows.add(s);
