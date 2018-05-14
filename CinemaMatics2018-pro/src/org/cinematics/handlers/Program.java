@@ -46,11 +46,11 @@ public class Program {
 				break;
 			case 7:
 				done = true;
-				DBUtils.closeConnection();
 				break;
 			default:
 				System.out.println("That is not a valid menu option");
 			}
+			DBUtils.closeConnection();
 		}
 	}
 	
