@@ -2,6 +2,8 @@ package org.cinematics.handlers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -9,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import org.cinematics.db.DBQueryHelper;
 import org.cinematics.model.Booking;
@@ -89,6 +90,7 @@ public class DataManager {
         	Theatre theatre;
             while(result.next()) {
                 theatre = new Theatre(result.getString("name"));
+                theatre.setId(result.getInt("id")); // Unique DBid created by DBMS
                 t.add(theatre);
             }
         } catch (SQLException e) {
@@ -130,35 +132,39 @@ public class DataManager {
     	
         ResultSet result = DBQueryHelper.prepareAndExecuteStatementQuery(getAllTheatres,theatreName).get();
         try {
-        	Theatre theatre;
+        	
+        	LocalDateTime rsStartT;
+        	LocalDateTime rsEndT;
+        	
             while(result.next()) {
-                theatre = new Theatre(result.getString("name"));
-                System.out.println(theatre.getName());
-                //t.add(theatre);
+                
+                rsStartT = result.getTimestamp("starttime").toLocalDateTime();
+                rsEndT = result.getTimestamp("endtime").toLocalDateTime();
+                
+                
+                if( show.checkOverlap(rsStartT, rsEndT) ) {
+                	
+                    DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm");
+
+                	System.out.println("Show overlaps " + fmt.format(rsStartT) + " to " + fmt.format(rsEndT));
+                	return false; // Overlaps
+                }
+                
             }
         } catch (SQLException e) {
             System.err.println(e);
         }
-    	
-        return false;
 
-    	/*
-    	
-    	
-    	if( t != null ) {
-    		t.addShow(show);
-    	} else {
-    		return false;
-    	}
-    	
-        if(theatres.containsKey(theatreName)) {
-            Theatre theatre = theatres.get(theatreName);
-            theatre.addShow(show);
-            return true;
-        }
-        return false;
+        int theatreID = getTheatre(theatreName).getId();
+        String showInsert = "INSERT INTO cinema.shows (starttime, endtime, movie_id, theatre_id) VALUES (?,?,?,?);";
+
+        long updRes = DBQueryHelper.prepareAndExecuteStatementUpdate(showInsert, 
+        		show.getStart(),
+        		show.getEnd(),
+        		show.getMovie().getId(),
+        		theatreID);
         
-        */
+        return updRes > 0;
     }
     
     

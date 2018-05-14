@@ -17,7 +17,7 @@ public class Program {
 		boolean done = false;
 		DataManager dataManager = new DataManager();
 		UserInterface ui = new UserInterface();
-		setup(dataManager);
+		// setup(dataManager);
 		
 		while(!done) {
 			
@@ -266,7 +266,9 @@ public class Program {
 
 		show.setStart(startTime);
 		show.setEnd(endTime);
-		dataManager.addShowToTheatre(show, chosenTheatre);
+		
+		if( !dataManager.addShowToTheatre(show, chosenTheatre))
+			System.out.println("Could not add show to DB.");
 	}
 
 	public static void viewAllShowInTheatre(DataManager dataManager) {

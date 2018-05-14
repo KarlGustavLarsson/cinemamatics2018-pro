@@ -34,3 +34,6 @@ CREATE TABLE IF NOT EXISTS cinema.bookings (
  seat_col int not null,
  customer_id int references cinema.customers
 );
+
+// INSERT INTO cinema.shows (starttime, endtime, movie_id, theatre_id) VALUES 
+('2018-05-01 12:00:00', '2018-05-01 13:00:00', 1, 1 );
