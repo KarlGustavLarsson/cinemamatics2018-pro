@@ -49,8 +49,9 @@ public class Show implements Comparable <Show>{
 	public Booking[][] getBookings() {
 		Booking[][] bookings = new Booking[Theatre.SEAT_ROWS][Theatre.SEAT_COLS];
 		String bookingsQuery = "SELECT * FROM cinema.bookings WHERE show_id = ?";
-		ResultSet rs = DBQueryHelper.prepareAndExecuteStatementQuery(bookingsQuery, id).get();
+		
 		try {
+			ResultSet rs = DBQueryHelper.prepareAndExecuteStatementQuery(bookingsQuery, id).get();
 			Booking booking;
 			int row;
 			int col;
@@ -106,8 +107,8 @@ public class Show implements Comparable <Show>{
 	public Movie getMovieID() {
 		
 		String movieQuery = "SELECT * FROM cinema.movies WHERE id = ?";
-		ResultSet result = DBQueryHelper.prepareAndExecuteStatementQuery(movieQuery, movieID).get();
 		try {
+			ResultSet result = DBQueryHelper.prepareAndExecuteStatementQuery(movieQuery, movieID).get();
 			Movie movie;
 			if(result.next()) {
 				movie = new Movie();

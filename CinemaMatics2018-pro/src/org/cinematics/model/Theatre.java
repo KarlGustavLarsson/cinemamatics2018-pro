@@ -23,9 +23,10 @@ public class Theatre {
 
 	public List<Show> getAllShows() {
 		String getAllShowsQuery = "SELECT * FROM cinema.shows INNER JOIN cinema.theatres ON theatres.id=shows.theatre_id WHERE name = ?;";
-		ResultSet rs = DBQueryHelper.prepareAndExecuteStatementQuery(getAllShowsQuery,name).get();
 		List<Show> shows = new ArrayList<>();
+
 		try {
+			ResultSet rs = DBQueryHelper.prepareAndExecuteStatementQuery(getAllShowsQuery,name).get();
 			Show show;
 			while(rs.next()) {
 				show = new Show();
