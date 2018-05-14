@@ -58,11 +58,12 @@ public class DataBaseHandler {
     }
 
 
-    public void addCustomer(int id, String name){
+    public void addCustomer(int id, String n){
         open();
         try {
             String query =
-                    "INSERT INTO customer (id, name) values (2, 'kunden2')";
+                    "INSERT INTO customer (id, name) values (" + id + ", '" + n + "')";
+            System.out.println(query);
                             
 
             // execute query
@@ -80,6 +81,7 @@ public class DataBaseHandler {
 
     public Customer getCustomer(int custId) {
     	open();
+    	Customer retCust = new Customer();
         try {
             String query = "SELECT * FROM customer WHERE id = " + custId + ";";
 
@@ -91,19 +93,20 @@ public class DataBaseHandler {
 
             // return query result
             
-            Customer retCust = new Customer();
+            
             while ( rs.next () ){
             	
             	retCust.setCustId(rs.getInt("id"));
             	retCust.setName(rs.getString("name"));
             }
-            return retCust;
+            
 
         } catch(SQLException e){
             System.out.println("Query failed");
         } finally {
             close();
         }
+        return retCust;
     }
     	
 
@@ -155,7 +158,7 @@ public class DataBaseHandler {
             close();
         }
     }
-   private void insertOwner() {
+    private void insertOwner() {
 	   open();
        try {
            String query =

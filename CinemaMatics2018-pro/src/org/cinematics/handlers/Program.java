@@ -50,8 +50,8 @@ public class Program {
 				break;
 				
 			case 8:
-				myDbHandler.addCustomer(2, "kunden2");
-				
+				myDbHandler.addCustomer(3, "ture");
+				System.out.println(myDbHandler.getCustomer(3).getName());
 				
 				break;
 			default:
