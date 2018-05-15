@@ -8,17 +8,14 @@ import java.time.temporal.ChronoUnit;
 import org.cinematics.db.DBQueryHelper;
 
 // Describes a show in the theatre, Start, End and Movie
-
 public class Show implements Comparable <Show>{
 	
 	private Integer id; 
 	private LocalDateTime start;
 	private LocalDateTime end;
 	private Integer movieID;
-		// The seating arrangement
 	
 	public Show() {
-		
 	}
 	
 	public Show(LocalDateTime start, LocalDateTime end, Integer movie) {
@@ -69,30 +66,18 @@ public class Show implements Comparable <Show>{
 		return (start.isBefore(endTime) && startTime.isBefore(end));
 	}
 	
-	/**
-	 * @return the start
-	 */
 	public LocalDateTime getStart() {
 		return start;
 	}
 	
-	/**
-	 * @param start the start to set
-	 */
 	public void setStart(LocalDateTime start) {
 		this.start = start;
 	}
 	
-	/**
-	 * @return the end
-	 */
 	public LocalDateTime getEnd() {
 		return end;
 	}
 	
-	/**
-	 * @param end the end to set
-	 */
 	public void setEnd(LocalDateTime end) {
 		this.end = end;
 	}
@@ -116,25 +101,14 @@ public class Show implements Comparable <Show>{
 		return null;
 	}
 	
-	/**
-	 * @param movieID the movieID to set
-	 */
 	public void setMovieID(Integer movieID) {
 		this.movieID = movieID;
 	}
 	
-	/**
-	 * 
-	 * @return the id
-	 */
 	public Integer getId() {
 		return id;
 	}
 
-	/**
-	 * 
-	 * @param show is
-	 */
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -149,15 +123,20 @@ public class Show implements Comparable <Show>{
 	
 	public void showAllSeats() {
 		System.out.print(" |");
+		
 		for(int i = 0; i < Theatre.SEAT_COLS; i++) {
 			System.out.print(i+" ");
 		}
+		
 		System.out.println("");
+		
 		for(int i = 0; i < Theatre.SEAT_COLS; i++) {
 			System.out.print("--");
 		}
+		
 		System.out.println("-");
 		Booking[][] bookings = getBookings();
+		
 		for(int row = 0; row < bookings.length; row++) {
 			System.out.print(row+"|");
 			for(int col = 0; col < bookings[row].length; col++) {
@@ -165,16 +144,17 @@ public class Show implements Comparable <Show>{
 			}
 			System.out.println("");
 		}
+		
 		System.out.print("*\\");
+		
 		for(int i = 1; i < Theatre.SEAT_COLS; i++) {
 			System.out.print("__");
 		}
+		
 		System.out.println("/*");
 		System.out.println("");
 	}
 
-	
-	
 	public Seat[] getSeats(int startingRow, int startingCol, int numberOfSeats) {
 		Seat[] seats = new Seat[numberOfSeats];
 		for(int i = 0; i < numberOfSeats; i++) {

@@ -18,6 +18,8 @@ public class Program {
 		boolean done = false;
 		DataManager dataManager = new DataManager();
 		UserInterface ui = new UserInterface();
+		
+		// Historically used to setup some data to test with
 		// setup(dataManager);
 		
 		while(!done) {
@@ -54,6 +56,7 @@ public class Program {
 		}
 	}
 	
+	/* No longer needing initializing values to test with
 	public static void setup(DataManager dataManager) {
 		Movie m1 = new Movie();
 		m1.setName("Terminator");
@@ -73,6 +76,7 @@ public class Program {
 		Show show = new Show(LocalDateTime.now(), LocalDateTime.now(), m1.getId());
 		dataManager.addShowToTheatre(show, "Salong1");
 	}
+	*/
 
 	public static void addMovie(DataManager dataManager) {
 		Movie movie = new Movie();
@@ -113,7 +117,10 @@ public class Program {
 	public static void makeBooking(DataManager dataManager, Integer choice) {
 		boolean doneWithBooking = false; 
 		while(!doneWithBooking) {
+			
+			// Userhandling may be added later on
 			int customerID = dataManager.createCustomer(""); //customer id added to separate bookings
+			
 			//Choose show
 			System.out.println("Choice "+choice+" please");
 			for (Theatre cT : dataManager.getTheatres()) {
@@ -146,6 +153,8 @@ public class Program {
 				System.out.println("You have to input y or n!");
 				return;
 			}
+			
+			// Seats booked together handled differently from individually picked seat booking
 			if(seatsTogether) {
 				System.out.println("Choose starting seat:");
 				int startingRow = UserInterface.chooseSeatRow();
@@ -172,8 +181,8 @@ public class Program {
 				show.showAllSeats();
 				showTickets(customerID, showId, Arrays.asList(seats));
 
-			//Booking seats separate	
-			} else {
+			// Seats booked together handled differently from individually picked seat booking	
+			} else { // Pick seats
 				List<Seat> seats = new ArrayList<Seat>();
 				Booking booking = new Booking();
 				booking.setCustomerID(customerID);
@@ -210,6 +219,7 @@ public class Program {
 				show.showAllSeats();
 				showTickets(customerID, showId, seats);
 			}//Else
+			
 			dataManager.endBooking(false);
 			doneWithBooking = true;
 		}//While

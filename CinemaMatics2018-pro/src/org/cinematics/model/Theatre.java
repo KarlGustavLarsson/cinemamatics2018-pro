@@ -8,13 +8,12 @@ import org.cinematics.db.DBQueryHelper;
 import org.cinematics.handlers.DataManager;
 
 // Describes the Theatre studio where the movie is shown
-
 public class Theatre {
 	private transient int id;
 	public static int SEAT_ROWS = 5;
 	public static int SEAT_COLS = 10;
-	private String name;						// The studio might have a name like "Blue Room"				// The show that is booked for the studio
-
+	private String name;	// The studio might have a name like "Blue Room"
+	
 
 	// Constructor
 	public Theatre(String name) {
@@ -41,22 +40,14 @@ public class Theatre {
 		return shows;
 	}
 
-	/**
-	 * @return the name
-	 */
 	public String getName() {
 		return name;
 	}
-	/**
-	 * @param name the name to set
-	 */
+
 	public void setName(String name) {
 		this.name = name;
 	}
 	
-	/**
-	 * @return the show associated with this theatre id
-	 */
 	public Show getShow(Integer showID) {
 		return DataManager.getShowFromID(showID);
 	}
@@ -66,16 +57,10 @@ public class Theatre {
 		return name;
 	}
 
-	/**
-	 * @return the id
-	 */
 	public int getId() {
 		return id;
 	}
 
-	/**
-	 * @param id the id to set
-	 */
 	public void setId(int id) {
 		this.id = id;
 	}

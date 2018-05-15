@@ -6,11 +6,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-/**
- * 
- * This class is mainly used for retrieval of user input
- *
- */
 public class UserInterface {
 	
 	static BufferedReader con = new BufferedReader(new InputStreamReader(System.in));
@@ -42,7 +37,7 @@ public class UserInterface {
 		return myInt;
 	}
 	
-	// Get Int from console
+	// Get int from console input
 	public static int inputInt() {
 		int myInt = 0;
 		try {
@@ -164,9 +159,4 @@ public class UserInterface {
 		return getUserInputString();
 	}
 	
-
-	
-	
-	
-
 }

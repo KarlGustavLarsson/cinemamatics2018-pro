@@ -6,9 +6,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 public class DBQueryHelper {
-    
-	
-	
+    	
     public static Optional<ResultSet> prepareAndExecuteStatementQuery(String querySQL, Object... values) {
         
     	Connection connection = DBUtils.getConnection();
