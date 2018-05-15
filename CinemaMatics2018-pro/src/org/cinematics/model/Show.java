@@ -186,24 +186,5 @@ public class Show implements Comparable <Show>{
 		}
 		return seats;
 	}
-	
-	public boolean areSeatsAvailable(Seat[] seats) throws OutOfSeatingBoundsException{
-		for(int i = 0; i < seats.length; i++) {
-			if(!isSeatAvailable(seats[i].row, seats[i].col)) {
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	public boolean isSeatAvailable(int row, int col) throws OutOfSeatingBoundsException{
-		if(row >= Theatre.SEAT_ROWS || row < 0) {
-			throw new OutOfSeatingBoundsException("Row out of bounds");
-		} 
-		if(col >= Theatre.SEAT_COLS || col < 0) {
-			throw new OutOfSeatingBoundsException("Col out of bounds");
-		}
-		return (getBookings()[row][col] == null);
-	}
 
 }
