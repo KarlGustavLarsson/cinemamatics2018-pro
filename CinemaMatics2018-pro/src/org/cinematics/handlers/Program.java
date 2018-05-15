@@ -50,9 +50,9 @@ public class Program {
 				break;
 				
 			case 8:
-				System.out.println(myDbHandler.loadShowFromDb().get(1).getEnd());
-				//myDbHandler.addCustomer(3, "ture");
-				//System.out.println(myDbHandler.getCustomer(3).getName());
+				//myDbHandler.loadShowFromDb();
+				dataManager.loadShowsInDataManager();
+				dataManager.loadTheatresInDataManager();
 				
 				break;
 			default:

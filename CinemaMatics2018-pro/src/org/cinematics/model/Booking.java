@@ -11,6 +11,9 @@ public class Booking {
 		bookingId = BOOKING_COUNTER;
 		BOOKING_COUNTER++;
 	}
+	public Booking(int id) {
+		bookingId = id;
+	}
 		
 	public void setCustomer(Customer c) {
 		myCust = c;

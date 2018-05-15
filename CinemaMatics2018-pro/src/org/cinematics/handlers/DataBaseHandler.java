@@ -9,11 +9,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.TreeMap;
 
+import org.cinematics.model.Booking;
 import org.cinematics.model.Customer;
 import org.cinematics.model.Movie;
 import org.cinematics.model.Show;
+import org.cinematics.model.Theatre;
 
 public class DataBaseHandler {
 	Connection conn;
@@ -63,18 +67,130 @@ public class DataBaseHandler {
         }
     }
 
-   
-    public List<Show> loadShowFromDb() {
-    	List<Show> shows = new ArrayList<>();
+    
+    
+    
+    public Map<String, Theatre> loadTheatresFromDb() {
     	
-    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-    	
-    	
-    	
+    	Map<String, Theatre> theatresToReturn;
+    	theatresToReturn = new TreeMap<String, Theatre>();	
     	open();
         try {
             String query =
-                    "SELECT * FROM show";
+                    "SELECT * FROM theatre";
+            
+            // execute query
+
+            Statement statement = conn.createStatement ();
+
+            ResultSet rs = statement.executeQuery (query);
+            
+            
+            while ( rs.next () ){
+            	
+            	Theatre theatreToAdd = new Theatre(rs.getString("name"));
+            	theatreToAdd.loadShowFromDb();
+            	theatresToReturn.put(theatreToAdd.getName(), theatreToAdd);
+            	
+            }
+
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+        } finally {
+            close();
+        }
+        
+        return theatresToReturn; 	
+    }
+    
+    public Show getShowFromDb(int showId) {
+    	Show retShow = new Show();
+    	
+    	return retShow;
+    }
+    
+    public Map<Integer, Booking> loadBookingsFromDb() {
+    	
+    	Map<Integer, Booking> bookingsToReturn;
+    	bookingsToReturn = new TreeMap<Integer, Booking>();
+    		
+    	open();
+        try {
+            String query =
+                    "SELECT * FROM booking";
+            
+            // execute query
+
+            Statement statement = conn.createStatement ();
+
+            ResultSet rs = statement.executeQuery (query);
+            
+            Customer aCust = new Customer();
+            
+            aCust.setCustId(1);
+            aCust.setAge(25);
+            aCust.setName("Kunden");
+           
+            
+            while ( rs.next () ){
+            	
+            	Booking bookingToAdd = new Booking();
+            	
+            	
+            	bookingToAdd.setCustomer(aCust);
+            	bookingToAdd.setShow(rs.getInt("show_id"));
+            	bookingsToReturn.put(bookingToAdd.getBookingId(), bookingToAdd);  // ??
+            	
+            }
+
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+        } finally {
+            close();
+        }
+        
+        return bookingsToReturn; 	
+    }
+    
+    
+    
+    
+    
+    public int getTheatreId(String theatreName) {
+    	
+    	int idToReturn = -1;
+    	open();
+        try {
+            String query =
+                    "SELECT * FROM theatre WHERE name = '" + theatreName + "';";
+            
+            // execute query
+
+            Statement statement = conn.createStatement ();
+
+            ResultSet rs = statement.executeQuery (query);
+            rs.next();
+            idToReturn = rs.getInt("id");
+           
+
+        } 
+        catch(SQLException e){
+            System.out.println(e.getMessage());
+        } finally {
+            close();
+        }
+
+    	return idToReturn;
+    }
+    
+    public List<Show> loadShowFromDb(int id) {
+    	List<Show> shows = new ArrayList<>();
+    	
+    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");	
+    	open();
+        try {
+            String query =
+                    "SELECT * FROM show WHERE theatre_id = " + id + ";";
             
             // execute query
 
@@ -87,8 +203,7 @@ public class DataBaseHandler {
             	
             	LocalDateTime startT = LocalDateTime.parse((rs.getString("starttime")), formatter);
             	LocalDateTime endT = LocalDateTime.parse((rs.getString("endtime")), formatter);
-            	Show showToAdd = new Show(rs.getInt("id"), startT, endT, getMovie(rs.getInt("movie_id")));
-            			
+            	Show showToAdd = new Show(rs.getInt("id"), startT, endT, getMovieFromDb(rs.getInt("movie_id")));
             	shows.add(showToAdd);
             	
             }
@@ -98,10 +213,51 @@ public class DataBaseHandler {
         } finally {
             close();
         }
+        for (Show cShow : shows) {
+        	System.out.println(cShow.getId() + " " + cShow.getMovie().getName());
+        }
         return shows;
     	
     }
-    public Movie getMovie(int movieId) {
+    
+    public List<Show> loadShowsFromDb() {
+    	List<Show> shows = new ArrayList<>();
+    	
+    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");	
+    	open();
+        try {
+            String query =
+                    "SELECT * FROM show WHERE theatre_id = ";
+            
+            // execute query
+
+            Statement statement = conn.createStatement ();
+
+            ResultSet rs = statement.executeQuery (query);
+            
+            
+            while ( rs.next () ){
+            	
+            	LocalDateTime startT = LocalDateTime.parse((rs.getString("starttime")), formatter);
+            	LocalDateTime endT = LocalDateTime.parse((rs.getString("endtime")), formatter);
+            	Show showToAdd = new Show(rs.getInt("id"), startT, endT, getMovieFromDb(rs.getInt("movie_id")));
+            	shows.add(showToAdd);
+            	
+            }
+
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+        } finally {
+            close();
+        }
+        for (Show cShow : shows) {
+        	System.out.println(cShow.getId() + " " + cShow.getMovie().getName());
+        }
+        return shows;
+    	
+    }
+    
+    public Movie getMovieFromDb(int movieId) {
     	Movie retMovie = new Movie();
     	
     	open();
@@ -114,7 +270,7 @@ public class DataBaseHandler {
             Statement statement = conn.createStatement ();
 
             ResultSet rs = statement.executeQuery (query);
-            
+            rs.next();
             
             retMovie.setMovieIdCounter(rs.getInt("id"));
             retMovie.setName(rs.getString("name"));
@@ -216,185 +372,6 @@ public class DataBaseHandler {
         }
         return retCust;
     }
-    	
-
-    
-    private void getEX1Pets(){
-        open();
-        try {
-            String query = "SELECT * FROM ex1.pet";
-
-            // execute query
-
-            Statement statement = conn.createStatement ();
-
-            ResultSet rs = statement.executeQuery (query);
-
-            // return query result
-
-            while ( rs.next () ){
-                System.out.println(
-                        rs.getInt("id") + ". " + rs.getString("name"));
-            }
-
-        } catch(SQLException e){
-            System.out.println("Query failed");
-        } finally {
-            close();
-        }
-    }
-    private void getEX1Owners(){
-        open();
-        try {
-            String query = "SELECT * FROM ex1.owner";
-
-            // execute query
-
-            Statement statement = conn.createStatement ();
-
-            ResultSet rs = statement.executeQuery (query);
-
-            // return query result
-            while ( rs.next () ){
-                System.out.println(
-                        rs.getInt("id") + ". " + rs.getString("name"));
-            }
-
-        } catch(SQLException e){
-            System.out.println("Query failed");
-        } finally {
-            close();
-        }
-    }
-    private void insertOwner() {
-	   open();
-       try {
-           String query =
-        		   "INSERT INTO owner (id, name)" + 
-        		   " VALUES (1, 'adsf')";
-            System.out.println(query);
-            
-        
-           
-            
-
-           
-           
-           // execute query
-
-           Statement statement = conn.createStatement ();
-           ResultSet rs = statement.executeQuery (query);
-           }
-       catch(SQLException e){
-           System.out.println("Query failed " + e.getMessage());
-       } finally {
-           close();
-       }
-   }
-    
-    private void getEX1PetsWithOwner(){
-        open();
-        try {
-            String query =
-                    "SELECT o.name as owner, p.name as pet, p.age as age" +
-                    " FROM ex1.pet p " +
-                    " INNER JOIN ex1.owner o ON o.id=p.owner_id";
-
-            // execute query
-
-            Statement statement = conn.createStatement ();
-
-            ResultSet rs = statement.executeQuery (query);
-
-
-
-            // return query result
-
-            while ( rs.next () ){
-                System.out.println(
-                        "Owner: " + rs.getString("owner") +
-                        "\nPetname: " + rs.getString("pet") +
-                        "\nAge: " + rs.getInt("age") + "\n");
-            }
-
-        } catch(SQLException e){
-            System.out.println("Query failed" + e.getMessage());
-        } finally {
-            close();
-        }
-    }
-
-
-    private void addEX2NewOwner(int owner, int pet){
-        open();
-        try {
-            String query = "INSERT INTO ex2.owner_pet (owner_id, pet_id) values ("+ owner + ", " + pet + ")";
-
-            // execute query
-
-            Statement statement = conn.createStatement ();
-
-            ResultSet rs = statement.executeQuery (query);
-
-
-
-            // return query result
-
-            while ( rs.next () ){
-                System.out.println(
-                        "Petname: " + rs.getString("name") +
-                                "\nAge: " + rs.getInt("age") + "\n");
-            }
-
-        } catch(SQLException e){
-            System.out.println(e.getMessage());
-        } finally {
-            close();
-        }
-    }
-
-    private void getEX2Pets(){
-        open();
-        try {
-            String query = "SELECT * FROM ex2.pet";
-
-            // execute query
-
-            Statement statement = conn.createStatement ();
-
-            ResultSet rs = statement.executeQuery (query);
-
-
-
-            // return query result
-
-            while ( rs.next () ){
-                System.out.println(
-                        rs.getInt("id") + ". " + rs.getString("name"));
-            }
-
-        } catch(SQLException e){
-            System.out.println("Query failed:" + e.getMessage());
-            
-        } finally {
-            close();
-        }
-    }
-
    
-
-    private static void givePetNewOwner(DataBaseHandler db){
-        Scanner scan = new Scanner(System.in);
-        db.getEX1Owners();
-        System.out.println("Owner id:");
-        int owner = scan.nextInt();
-        db.getEX1Pets();
-        System.out.println("Pet id:");
-        int pet = scan.nextInt();
-        db.addEX1NewOwner(owner, pet);
-        db.addEX2NewOwner(owner, pet);
-
-    }
-	
 
 }

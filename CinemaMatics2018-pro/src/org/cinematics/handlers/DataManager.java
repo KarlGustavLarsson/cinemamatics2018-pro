@@ -20,6 +20,8 @@ import org.cinematics.model.Theatre;
 //TEST
 public class DataManager {
 	
+	DataBaseHandler myDbh = new DataBaseHandler();
+	
 	private Map<String, Theatre> theatres;
 	private Map<Integer, Booking> bookings;
 	private Set<Movie> movies;
@@ -30,7 +32,16 @@ public class DataManager {
 		movies = new TreeSet<Movie>(Comparator.comparing(Movie::getName));
 	}
 	
+	
+	
+	public void loadShowsInDataManager() {
+		myDbh.loadShowsFromDb();
+	}
+	public void loadTheatresInDataManager() {
+		theatres = myDbh.loadTheatresFromDb();
+	}
 	public Theatre getTheatre(String name) {
+		
 		return theatres.get(name);
 	
 	}
@@ -49,6 +60,7 @@ public class DataManager {
 	
 	public boolean addTheatre(Theatre theatre) {
 		if(!theatres.containsKey(theatre.getName())) {
+			theatre.loadShowFromDb();
 			theatres.put(theatre.getName(), theatre);
 			return true;
 		}

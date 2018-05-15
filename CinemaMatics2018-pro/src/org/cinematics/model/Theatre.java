@@ -10,6 +10,7 @@ public class Theatre {
 	
 	
 	
+	private static final String String = null;
 	public static int SEAT_ROWS = 5;
 	public static int SEAT_COLS = 10;
 	private String name;						// The studio might have a name like "Blue Room"
@@ -29,7 +30,14 @@ public class Theatre {
 	public void loadShowFromDb() {
 		
 		DataBaseHandler dbH = new DataBaseHandler();
-		Show showToAdd = new Show();
+		
+		
+		this.shows = dbH.loadShowFromDb(getId());
+		
+	}
+	public int getId() {
+		DataBaseHandler dbh = new DataBaseHandler();
+		return dbh.getTheatreId(this.name);
 		
 	}
 	
