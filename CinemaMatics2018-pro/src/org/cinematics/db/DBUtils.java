@@ -2,11 +2,15 @@ package org.cinematics.db;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class DBUtils {
 
+    public static Logger logger = LogManager.getLogManager().getLogger(Logger.GLOBAL_LOGGER_NAME);
+
     private static Connection connection;
-    
     
     //THESE VALUES HAVE TO BE MODIFIED FOR YOUR DATABASE 
     private static String driverName = "org.postgresql.Driver";
@@ -28,6 +32,7 @@ public class DBUtils {
         try {
             if(connection != null) {
                 connection.close();
+                logger.log(Level.INFO, "DB Closed");
                 return true;
             }
             return false;
@@ -49,6 +54,7 @@ public class DBUtils {
         
         try {
             connection = DriverManager.getConnection(dbAdress, userName, password);
+            logger.log(Level.INFO, "DB Opened");
             return true;
             
         } catch (SQLException e) {
@@ -71,6 +77,4 @@ public class DBUtils {
         }
         return true;
     }
-    
-    
 }

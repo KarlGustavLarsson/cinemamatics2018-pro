@@ -1,9 +1,14 @@
 package org.cinematics.handlers;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.LogManager;
 
 import org.cinematics.db.DBUtils;
 import org.cinematics.model.Booking;
@@ -18,6 +23,13 @@ public class Program {
 		boolean done = false;
 		DataManager dataManager = new DataManager();
 		UserInterface ui = new UserInterface();
+		
+		try {
+			InputStream in = Files.newInputStream(Paths.get("logging.properties"));
+			LogManager.getLogManager().readConfiguration(in);
+		} catch (SecurityException | IOException e) {
+			System.err.println(e);
+		}
 		
 		// Historically used to setup some data to test with
 		// setup(dataManager);

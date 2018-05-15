@@ -4,17 +4,25 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class DBQueryHelper {
-    	
+	
+    public static Logger logger = LogManager.getLogManager().getLogger(Logger.GLOBAL_LOGGER_NAME);
+    
     public static Optional<ResultSet> prepareAndExecuteStatementQuery(String querySQL, Object... values) {
-        
     	Connection connection = DBUtils.getConnection();
         try {
             PreparedStatement stmt = connection.prepareStatement(querySQL);
+            logger.log(Level.INFO, "PrepareQ: "+querySQL);
+            
             for(int i = 0; i < values.length; i++) {
                 stmt.setObject(i+1, values[i]);
+                logger.log(Level.INFO, " -> "+values[i]);
             }
+            
             ResultSet results = stmt.executeQuery();
             return Optional.of(results);
             
@@ -27,10 +35,15 @@ public class DBQueryHelper {
     public static long prepareAndExecuteStatementUpdate(String updateSQL, Object... values) {
     	Connection connection = DBUtils.getConnection();
         try {
+        	
             PreparedStatement stmt = connection.prepareStatement(updateSQL);
+            logger.log(Level.INFO, "PrepareU: "+updateSQL);
+            
             for(int i = 0; i < values.length; i++) {
                 stmt.setObject(i+1, values[i]);
+                logger.log(Level.INFO, " -> "+values[i]);
             }
+            
             long result = stmt.executeUpdate();
             return result;
             
@@ -44,12 +57,17 @@ public class DBQueryHelper {
     	Connection connection = DBUtils.getConnection();
         try {
             PreparedStatement stmt = connection.prepareStatement(updateSQL, PreparedStatement.RETURN_GENERATED_KEYS);
+            logger.log(Level.INFO, "PrepareUK: "+updateSQL);
+            
             for(int i = 0; i < values.length; i++) {
                 stmt.setObject(i+1, values[i]);
+                logger.log(Level.INFO, " -> "+values[i]);
             }
+            
             stmt.executeUpdate();
             ResultSet rs = stmt.getGeneratedKeys();
             return rs;
+            
         } catch (SQLException e) {
             System.err.println(e);
             return null;
@@ -60,15 +78,23 @@ public class DBQueryHelper {
     	Connection connection = DBUtils.getConnection();
     	try {
     		connection.setAutoCommit(false);
-            PreparedStatement stmt = connection.prepareStatement(updateSQL, PreparedStatement.RETURN_GENERATED_KEYS);
+    		logger.log(Level.INFO, "Starting Transaction Update");
+
+    		PreparedStatement stmt = connection.prepareStatement(updateSQL, PreparedStatement.RETURN_GENERATED_KEYS);
+            logger.log(Level.INFO, "PrepareTUK: "+updateSQL);
+            
             for(int i = 0; i < values.length; i++) {
                 stmt.setObject(i+1, values[i]);
+                logger.log(Level.INFO, " -> "+values[i]);
             }
+            
             long res = stmt.executeUpdate();
             return res;
+            
         } catch (SQLException e) { // Exception setAutoCommit, prepareStatement, executeUpdate
             try {
-				connection.rollback();			
+				connection.rollback();
+				logger.log(Level.INFO, "Exception Transaction rollback");
 			} catch (SQLException e1) { // Exception from rollback
 				System.err.println(e1);		
 			} finally { // If rollback happens, we need to set autocommit to true again
@@ -92,9 +118,11 @@ public class DBQueryHelper {
         	}
     		if(doRollback) {
     			connection.rollback();
+				logger.log(Level.INFO, "Transaction rollback");
     			return false;
     		} else {
     			connection.commit();
+				logger.log(Level.INFO, "Transaction commit");
         		return true;
     		}
         } catch (SQLException e) {
@@ -108,5 +136,4 @@ public class DBQueryHelper {
 			}
         }
     }
-    
 }
