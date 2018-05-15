@@ -199,6 +199,8 @@ public class DataBaseHandler {
             	LocalDateTime startT = LocalDateTime.parse((rs.getString("starttime")), formatter);
             	LocalDateTime endT = LocalDateTime.parse((rs.getString("endtime")), formatter);
             	Show showToAdd = new Show(rs.getInt("id"), startT, endT, getMovieFromDb(rs.getInt("movie_id")));
+            	// add bookings from database...
+            	
             	shows.add(showToAdd);
             	
             }

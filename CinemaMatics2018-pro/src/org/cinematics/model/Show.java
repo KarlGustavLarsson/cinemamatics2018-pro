@@ -1,4 +1,7 @@
 package org.cinematics.model;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -11,8 +14,6 @@ import org.cinematics.handlers.DataBaseHandler;
 // Describes a show in the theatre, Start, End and Movie
 
 public class Show implements Comparable <Show>{
-	
-	
 	
 
 	private static int ID_COUNTER = 1;
@@ -43,6 +44,38 @@ public class Show implements Comparable <Show>{
 		this.end = end;
 		this.movie = movie;
 	}
+	
+	public loadBookingsFromDb() {
+		open();
+        try {
+            String query =
+                    "SELECT * FROM ticket WHERE booking_id = " + this.id + ";";
+            
+            // execute query
+
+            Statement statement = conn.createStatement ();
+
+            ResultSet rs = statement.executeQuery (query);
+            
+            
+            while ( rs.next () ){
+            	
+            	
+            	shows.add(showToAdd);
+            	
+            }
+
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+        } finally {
+            close();
+        }
+        for (Show cShow : shows) {
+        	System.out.println(cShow.getId() + " " + cShow.getMovie().getName());
+        }
+        return shows;
+	}
+	
 	
 	//Make this object sortable in an arraylist
 	@Override
