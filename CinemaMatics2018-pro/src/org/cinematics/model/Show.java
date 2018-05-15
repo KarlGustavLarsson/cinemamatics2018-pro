@@ -126,7 +126,6 @@ public class Show implements Comparable <Show>{
 		this.movieID = movieID;
 	}
 	
-
 	/**
 	 * 
 	 * @return the id
