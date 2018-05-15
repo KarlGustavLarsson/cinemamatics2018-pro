@@ -103,11 +103,7 @@ public class DataBaseHandler {
         return theatresToReturn; 	
     }
     
-    public Show getShowFromDb(int showId) {
-    	Show retShow = new Show();
-    	
-    	return retShow;
-    }
+    
     
     public Map<Integer, Booking> loadBookingsFromDb() {
     	
@@ -125,6 +121,7 @@ public class DataBaseHandler {
 
             ResultSet rs = statement.executeQuery (query);
             
+            //Hardcoded customer needs to be fixed.. 
             Customer aCust = new Customer();
             
             aCust.setCustId(1);
@@ -136,11 +133,9 @@ public class DataBaseHandler {
             	
             	Booking bookingToAdd = new Booking();
             	
-            	
             	bookingToAdd.setCustomer(aCust);
-            	bookingToAdd.setShow(rs.getInt("show_id"));
-            	bookingsToReturn.put(bookingToAdd.getBookingId(), bookingToAdd);  // ??
-            	
+            	bookingToAdd.setShow(loadShowFromDb(rs.getInt("show_id")).get(0));
+            	bookingsToReturn.put(bookingToAdd.getBookingId(), bookingToAdd);  
             }
 
         } catch(SQLException e){

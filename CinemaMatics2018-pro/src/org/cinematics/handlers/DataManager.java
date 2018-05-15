@@ -33,7 +33,9 @@ public class DataManager {
 	}
 	
 	
-	
+	public void loadBookingsInDataManager() {
+		bookings = myDbh.loadBookingsFromDb();
+	}
 	public void loadShowsInDataManager() {
 		myDbh.loadShowsFromDb();
 	}

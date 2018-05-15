@@ -53,7 +53,7 @@ public class Program {
 				//myDbHandler.loadShowFromDb();
 				dataManager.loadShowsInDataManager();
 				dataManager.loadTheatresInDataManager();
-				
+				dataManager.loadBookingsInDataManager();
 				break;
 			default:
 				System.out.println("That is not a valid menu option");
