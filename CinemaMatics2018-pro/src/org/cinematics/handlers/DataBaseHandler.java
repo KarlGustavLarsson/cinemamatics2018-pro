@@ -20,10 +20,12 @@ import org.cinematics.model.Show;
 import org.cinematics.model.Theatre;
 
 public class DataBaseHandler {
+	
 	Connection conn;
 
     public DataBaseHandler(){
         init();
+        
     }
 
     private void init(){
@@ -105,7 +107,7 @@ public class DataBaseHandler {
     
     
     
-    public Map<Integer, Booking> loadBookingsFromDb() {
+    public Map<Integer, Booking> loadBookingsFromDb(DataManager dmgr) {
     	
     	Map<Integer, Booking> bookingsToReturn;
     	bookingsToReturn = new TreeMap<Integer, Booking>();
@@ -131,11 +133,12 @@ public class DataBaseHandler {
             
             while ( rs.next () ){
             	
-            	Booking bookingToAdd = new Booking();
-            	
+            	Booking bookingToAdd = new Booking(rs.getInt("id"));
             	bookingToAdd.setCustomer(aCust);
-            	bookingToAdd.setShow(loadShowFromDb(rs.getInt("show_id")).get(0));
-            	bookingsToReturn.put(bookingToAdd.getBookingId(), bookingToAdd);  
+            
+            	
+            	bookingsToReturn.put(bookingToAdd.getBookingId(), bookingToAdd);
+            	 
             }
 
         } catch(SQLException e){
@@ -146,6 +149,37 @@ public class DataBaseHandler {
         
         return bookingsToReturn; 	
     }
+    public Booking[][] loadTicketsFromDb(int bookingID, Customer cust) {
+		
+    	Booking[][] bookings = new Booking[Theatre.SEAT_ROWS][Theatre.SEAT_COLS];
+    			
+		open();
+        try {
+            String query =
+                    "SELECT * FROM ticket WHERE booking_id = " + bookingID + ";";
+            
+            // execute query
+
+            Statement statement = conn.createStatement ();
+            ResultSet rs = statement.executeQuery (query);
+           
+            while ( rs.next () ){
+            	System.out.println("row:" + rs.getInt("row") + "col:" + rs.getInt("colum"));
+            	Booking newBooking = new Booking(bookingID);
+            	newBooking.setCustomer(cust);
+            	bookings[rs.getInt("row")][rs.getInt("colum")] = newBooking;
+            }
+            
+
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+        } finally {
+            close();
+        }
+        
+        
+        return bookings;
+	}
     
     
     
@@ -198,6 +232,7 @@ public class DataBaseHandler {
             	
             	LocalDateTime startT = LocalDateTime.parse((rs.getString("starttime")), formatter);
             	LocalDateTime endT = LocalDateTime.parse((rs.getString("endtime")), formatter);
+            	
             	Show showToAdd = new Show(rs.getInt("id"), startT, endT, getMovieFromDb(rs.getInt("movie_id")));
             	// add bookings from database...
             	
@@ -217,19 +252,22 @@ public class DataBaseHandler {
     	
     }
     
-    public List<Show> loadShowsFromDb() {
+    public List<Show> loadShowsFromDb(DataManager dmgr) {
+    	
     	List<Show> shows = new ArrayList<>();
     	
     	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");	
     	open();
         try {
             String query =
-                    "SELECT * FROM show WHERE theatre_id = ";
+                    "SELECT * FROM show";
             
             // execute query
-
+            
+            
             Statement statement = conn.createStatement ();
-
+            
+            
             ResultSet rs = statement.executeQuery (query);
             
             
@@ -239,6 +277,23 @@ public class DataBaseHandler {
             	LocalDateTime endT = LocalDateTime.parse((rs.getString("endtime")), formatter);
             	Show showToAdd = new Show(rs.getInt("id"), startT, endT, getMovieFromDb(rs.getInt("movie_id")));
             	shows.add(showToAdd);
+            
+            	String query2 =
+                        "SELECT * FROM booking INNER JOIN ticket On id = booking_id WHERE show_id=" + showToAdd.getId();
+            	
+            	Statement statement2 = conn.createStatement ();
+            	ResultSet rs2 = statement2.executeQuery (query2);
+            	
+            		while (rs2.next()) {
+            			
+            			Booking newBooking = dmgr.getBooking(rs2.getInt("id"));
+                    	dmgr.saveBooking(newBooking, rs.getInt("row"), rs.getInt("colum"), showToAdd.getId(), dmgr.getTheatreForShow(showToAdd.getId()).getName());
+                    	
+            		}
+            	
+            	
+            	
+            	
             	
             }
 

@@ -29,6 +29,10 @@ public class Show implements Comparable <Show>{
 		
 	}
 	
+	public void setTickets(Booking[][] booking) {
+		bookings = booking;
+	}
+	
 	public Show(LocalDateTime start, LocalDateTime end, Movie movie) {
 		this.start = start;
 		this.end = end;
@@ -45,36 +49,7 @@ public class Show implements Comparable <Show>{
 		this.movie = movie;
 	}
 	
-	public loadBookingsFromDb() {
-		open();
-        try {
-            String query =
-                    "SELECT * FROM ticket WHERE booking_id = " + this.id + ";";
-            
-            // execute query
-
-            Statement statement = conn.createStatement ();
-
-            ResultSet rs = statement.executeQuery (query);
-            
-            
-            while ( rs.next () ){
-            	
-            	
-            	shows.add(showToAdd);
-            	
-            }
-
-        } catch(SQLException e){
-            System.out.println(e.getMessage());
-        } finally {
-            close();
-        }
-        for (Show cShow : shows) {
-        	System.out.println(cShow.getId() + " " + cShow.getMovie().getName());
-        }
-        return shows;
-	}
+	
 	
 	
 	//Make this object sortable in an arraylist
@@ -101,61 +76,45 @@ public class Show implements Comparable <Show>{
 		return (start.isBefore(endTime) && startTime.isBefore(end));
 	}
 	
-	/**
-	 * @return the start
-	 */
+
+
 	public LocalDateTime getStart() {
 		return start;
 	}
 	
-	/**
-	 * @param start the start to set
-	 */
+
+	
 	public void setStart(LocalDateTime start) {
 		this.start = start;
 	}
 	
-	/**
-	 * @return the end
-	 */
+
+	
 	public LocalDateTime getEnd() {
 		return end;
 	}
 	
-	/**
-	 * @param end the end to set
-	 */
+
 	public void setEnd(LocalDateTime end) {
 		this.end = end;
 	}
 	
-	/**
-	 * @return the movie
-	 */
+	
 	public Movie getMovie() {
 		return movie;
 	}
 	
-	/**
-	 * @param movie the movie to set
-	 */
 	public void setMovie(Movie movie) {
 		this.movie = movie;
 	}
 	
 
-	/**
-	 * 
-	 * @return the id
-	 */
+	
 	public Integer getId() {
 		return id;
 	}
 
-	/**
-	 * 
-	 * @param show is
-	 */
+	
 	public void setId(Integer id) {
 		this.id = id;
 	}

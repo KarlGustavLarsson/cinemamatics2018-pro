@@ -34,10 +34,10 @@ public class DataManager {
 	
 	
 	public void loadBookingsInDataManager() {
-		bookings = myDbh.loadBookingsFromDb();
+		bookings = myDbh.loadBookingsFromDb(this);
 	}
 	public void loadShowsInDataManager() {
-		myDbh.loadShowsFromDb();
+		myDbh.loadShowsFromDb(this);
 	}
 	public void loadTheatresInDataManager() {
 		theatres = myDbh.loadTheatresFromDb();
@@ -77,8 +77,7 @@ public class DataManager {
 		}
 		return false;
 	}
-	
-	
+
 	public boolean saveBooking(Booking booking, Integer row, Integer col, Integer showId, String theatreName) {
 		if(theatres.containsKey(theatreName)) {
 			Theatre theatre = theatres.get(theatreName);

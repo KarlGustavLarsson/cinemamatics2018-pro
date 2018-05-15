@@ -50,10 +50,10 @@ public class Program {
 				break;
 				
 			case 8:
-				//myDbHandler.loadShowFromDb();
-				dataManager.loadShowsInDataManager();
 				dataManager.loadTheatresInDataManager();
+				dataManager.loadShowsInDataManager();
 				dataManager.loadBookingsInDataManager();
+				
 				break;
 			default:
 				System.out.println("That is not a valid menu option");
@@ -62,25 +62,8 @@ public class Program {
 	}
 	
 	public static void setup(DataManager dataManager) {
-		Movie m1 = new Movie();
-		m1.setName("Terminator");
-		m1.setDescription("I'll be back");
-//		
-//		Movie m2 = new Movie();
-//		m2.setName("Scarface");
-//		m2.setDescription("Say hello to my....");
-//		
-//		dataManager.addMovie(m1);
-//		dataManager.addMovie(m2);
-//		dataManager.addTheatre(new Theatre("Salong1"));
-//		dataManager.addTheatre(new Theatre("Salong2"));
-//		dataManager.addTheatre(new Theatre("Salong3"));
-//		dataManager.addTheatre(new Theatre("Salong4"));
 
-		
-		//remember to fix this... movieId
-		Show show = new Show(LocalDateTime.now(), LocalDateTime.now(), m1);
-		dataManager.addShowToTheatre(show, "Salong1");
+
 	}
 
 	public static void addMovie(DataManager dataManager) {
