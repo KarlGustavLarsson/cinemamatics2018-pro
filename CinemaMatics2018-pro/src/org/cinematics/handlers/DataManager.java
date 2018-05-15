@@ -14,7 +14,6 @@ import java.util.TreeSet;
 import org.cinematics.db.DBQueryHelper;
 import org.cinematics.model.Booking;
 import org.cinematics.model.Movie;
-import org.cinematics.model.Seat;
 import org.cinematics.model.Show;
 import org.cinematics.model.Theatre;
 /**

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.cinematics.db.DBUtils;
-import org.cinematics.exceptions.OutOfSeatingBoundsException;
 import org.cinematics.model.Booking;
 import org.cinematics.model.Movie;
 import org.cinematics.model.Seat;
