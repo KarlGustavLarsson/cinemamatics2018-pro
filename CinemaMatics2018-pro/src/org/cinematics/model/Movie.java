@@ -29,7 +29,7 @@ public class Movie {
 	
 	@Override
 	public String toString() {
-		return "Id: "+ id + " Name: " + name + ", Description: " + description;
+		return "Id: "+ id + " | Name: " + name + " | Description: " + description;
 	}
 	
 }

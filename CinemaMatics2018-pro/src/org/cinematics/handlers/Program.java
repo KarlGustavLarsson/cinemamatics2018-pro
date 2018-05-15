@@ -1,6 +1,7 @@
 package org.cinematics.handlers;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -88,7 +89,10 @@ public class Program {
 		}
 		movie.setDescription(description);
 		movie.setName(title);
-		dataManager.addMovie(movie);
+		if( dataManager.addMovie(movie) )
+			System.out.println("The movie was added successfully.");
+		else
+			System.out.println("The movie insertion failed.");
 	}
 	
 	public static void addTheatre(DataManager dataManager) {
@@ -146,69 +150,83 @@ public class Program {
 			if(seatsTogether) {
 				System.out.println("Choose starting seat:");
 				int startingRow = UserInterface.chooseSeatRow();
-				if(startingRow == Integer.MIN_VALUE) return;
+				if(startingRow == Integer.MIN_VALUE) return;//Exit booking 
+
 				int startingCol = UserInterface.chooseSeatCol();
-				if(startingCol == Integer.MIN_VALUE) return;
+				if(startingCol == Integer.MIN_VALUE) return; //Exit booking
+				
 				Seat[] seats = show.getSeats(startingRow, startingCol, numberOfSeats);
-				try {
-					if(show.areSeatsAvailable(seats)) {
-						Booking booking = new Booking();
-						booking.setShowID(show.getId());
-						booking.setCustomerID(customerID);
-						for(Seat currentSeat : seats) {
-							dataManager.saveBooking(booking, currentSeat.row, currentSeat.col, show.getId(), theatre.getName());
-						}
-						System.out.println("Booking succeeded");
-						show.showAllSeats();
-						show.showTickets(booking);
-						break;
-					} else {
-						System.out.println("Those seats are not available");
-						continue;
-					}
-				} catch (OutOfSeatingBoundsException e) {
-					System.out.println("You can't sit on the floor, duuh.");
-					continue;
+
+				Booking booking = new Booking();
+				booking.setShowID(show.getId());
+				booking.setCustomerID(customerID);
+				boolean bookingInserted = true;
+				for(Seat currentSeat : seats) {
+					// Will not insert into db if the seat is taken
+					bookingInserted &= dataManager.startBooking(booking, currentSeat.row, currentSeat.col, show.getId(), theatre.getName());
 				}
+				if(!bookingInserted) { 
+					System.out.println("Those seats are not available");
+					break;
+				}
+				System.out.println("Booking succeeded");
+				show.showAllSeats();
+				showTickets(customerID, showId, Arrays.asList(seats));
+
 			//Booking seats separate	
 			} else {
 				List<Seat> seats = new ArrayList<Seat>();
-				while(!(seats.size() == numberOfSeats)) {
-					int startingRow = UserInterface.chooseSeatRow();
-					if(startingRow == Integer.MIN_VALUE) return;
-					int startingCol = UserInterface.chooseSeatCol();
-					if(startingCol == Integer.MIN_VALUE) return;
-					try {
-						Seat seat = new Seat(startingRow, startingCol);
-						if(seats.contains(seat)) {
-							System.out.println("You have already selected that seat");
-							continue;
-						}
-						if(show.isSeatAvailable(startingRow, startingCol)) {
-							seats.add(seat);
-						} else {
-							System.out.println("That seat is not available");
-							continue;
-						}
-					} catch (OutOfSeatingBoundsException e) {
-						System.out.println("You can't sit on the floor, duuh.");
-						continue;
-
-					}
-				}
 				Booking booking = new Booking();
 				booking.setCustomerID(customerID);
 				booking.setShowID(show.getId());
-				for(Seat currentSeat : seats) {
-					dataManager.saveBooking(booking, currentSeat.row, currentSeat.col, show.getId(), theatre.getName());
-				}
-				
+				while(!(seats.size() == numberOfSeats)) {
+					int startingRow = UserInterface.chooseSeatRow();
+					if(startingRow == Integer.MIN_VALUE) { //Exit booking
+						dataManager.endBooking(true);
+						return;
+					}	
+					int startingCol = UserInterface.chooseSeatCol();
+					if(startingCol == Integer.MIN_VALUE) { //Exit booking
+						dataManager.endBooking(true);
+						return;
+					}
+
+					Seat seat = new Seat(startingRow, startingCol);
+					if(seats.contains(seat)) {
+						System.out.println("You have already selected that seat");
+						continue;
+					}
+					boolean theSeatWasFree=dataManager.startBooking(
+							booking, startingRow, startingCol, show.getId(), theatre.getName());
+					if(!theSeatWasFree) {
+						System.out.println("That seat is not available");
+						continue;
+					} else {
+						seats.add(seat);
+					}
+
+				} //While
+			
 				System.out.println("Booking succeeded");
 				show.showAllSeats();
-				show.showTickets(booking);
-			}
+				showTickets(customerID, showId, seats);
+			}//Else
+			dataManager.endBooking(false);
 			doneWithBooking = true;
-		}
+		}//While
+	}
+	
+	public static void showTickets(Integer customerID, Integer showID, List<Seat> bookedSeats) {
+		
+		System.out.println("----Ticket----");
+		System.out.println("Customer id: "+customerID);
+		System.out.println("Show id: "+showID);
+		System.out.print("Seats: ");
+		bookedSeats.forEach(seat -> {
+			System.out.print("(row: "+seat.row+", column: "+seat.col+")"+ " ");
+		});
+		System.out.println("");
+		System.out.println("--------------");
 	}
 	
 	public static void createShow(DataManager dataManager) {
@@ -226,7 +244,7 @@ public class Program {
 				break;
 			}
 		}
-		if(show.getMovieID() == null) {
+		if(show.getMovie() == null) {
 			System.out.println("That movie id does not exist");
 			return;
 		}

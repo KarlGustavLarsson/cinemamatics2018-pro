@@ -100,10 +100,7 @@ public class Show implements Comparable <Show>{
 		this.end = end;
 	}
 	
-	/**
-	 * @return the movieID
-	 */
-	public Movie getMovieID() {
+	public Movie getMovie() {
 		
 		String movieQuery = "SELECT * FROM cinema.movies WHERE id = ?";
 		ResultSet result = DBQueryHelper.prepareAndExecuteStatementQuery(movieQuery, movieID).get();
@@ -151,7 +148,7 @@ public class Show implements Comparable <Show>{
 		 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm");
 		 String startTime = formatter.format(start);
 		 String endTime = formatter.format(end);
-		 return "ShowId:" + this.id  + " Namn:" + this.getMovieID().getName() + " Start:" + startTime + " Slut:" + endTime; 
+		 return "ShowId:" + this.id  + " Namn:" + this.getMovie().getName() + " Start:" + startTime + " Slut:" + endTime; 
 	 }
 	
 	public void showAllSeats() {
@@ -180,30 +177,7 @@ public class Show implements Comparable <Show>{
 		System.out.println("");
 	}
 
-	public void showTickets(Booking booking) {
-		List<Seat> bookedSeats = new ArrayList<Seat>();
-		Booking[][] bookings = getBookings();
-		for(int row = 0; row < bookings.length; row++) {
-			for(int col = 0; col < bookings[row].length; col++) {
-				Booking seatInTheatre = bookings[row][col];
-				if(seatInTheatre == null) {
-					continue;
-				}
-				if(booking.getCustomerID() == seatInTheatre.getCustomerID()) {
-					bookedSeats.add(new Seat(row,col));	
-				}
-			}
-		}
-		System.out.println("----Ticket----");
-		System.out.println("Booking id: "+booking.getBookingId());
-		//System.out.println(booking.getShow().toString());
-		System.out.print("Seats: ");
-		bookedSeats.forEach(seat -> {
-			System.out.print("(row: "+seat.row+", column: "+seat.col+")"+ " ");
-		});
-		System.out.println("");
-		System.out.println("--------------");
-	}
+	
 	
 	public Seat[] getSeats(int startingRow, int startingCol, int numberOfSeats) {
 		Seat[] seats = new Seat[numberOfSeats];

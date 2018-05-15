@@ -14,6 +14,7 @@ import java.util.TreeSet;
 import org.cinematics.db.DBQueryHelper;
 import org.cinematics.model.Booking;
 import org.cinematics.model.Movie;
+import org.cinematics.model.Seat;
 import org.cinematics.model.Show;
 import org.cinematics.model.Theatre;
 /**
@@ -99,7 +100,6 @@ public class DataManager {
         return result > 0;
     }
     
-    //TODO DB, DeGlobalize Theatres
     public boolean addShowToTheatre(Show show, String theatreName) {
     	
     	String getAllTheatres = "SELECT * FROM cinema.shows INNER JOIN cinema.theatres ON theatres.id=shows.theatre_id WHERE name = ?;";
@@ -135,35 +135,47 @@ public class DataManager {
         long updRes = DBQueryHelper.prepareAndExecuteStatementUpdate(showInsert, 
         		show.getStart(),
         		show.getEnd(),
-        		show.getMovieID().getId(),
+        		show.getMovie().getId(),
         		theatreID);
         
         return updRes > 0;
     }
     
-    
-    //TODO DB, DeGlobalize Theatres
-    public ResultSet saveBooking(Booking booking, Integer row, Integer col, Integer showId, String theatreName) {
-    	String checkIfSeatTakenQuery = "SELECT * FROM cinema.bookings"
-    			+ " WHERE show_id = ? AND seat_row = ? AND seat_col = ?;";
+    //This method must be used together with endBooking, so that the DB transaction is ended properly
+    public boolean startBooking(Booking booking, Integer row, Integer col, Integer showId, String theatreName) {
+    	String checkIfSeatTakenQuery = "SELECT seat_row, seat_col FROM cinema.bookings"
+    			+ " WHERE show_id = ?;";
     	Optional<ResultSet> rso = DBQueryHelper.prepareAndExecuteStatementQuery(
-    			checkIfSeatTakenQuery, showId, row, col);
+    			checkIfSeatTakenQuery, showId);
     	if(!rso.isPresent()) {
-    		return null;
+    		return false;
     	}
     	ResultSet rs = rso.get();
+    	int bookedCol;
+		int bookedRow;
     	try {
-			if(rs.next()) {
-				return null;
-			}
+	    	while(rs.next()) {
+	    		bookedRow = rs.getInt("seat_row");
+	    		bookedCol = rs.getInt("seat_col");
+	    		
+    			if(row == bookedRow && col == bookedCol) {
+					return false;
+				}		
+	    	}
 		} catch (SQLException e) {
 			System.err.println(e);
 		}
     	String insertBookingQuery = "INSERT INTO cinema.bookings "
     			+ "(show_id, seat_row, seat_col, customer_id) VALUES (?,?,?,?);";
-    	ResultSet rsWithKeys = DBQueryHelper.prepareAndExecuteStatementUpdateReturnKeys(
+    	
+		long result = DBQueryHelper.startTransactionUpdate(
     			insertBookingQuery, showId, row, col, booking.getCustomerID());
-        return rsWithKeys;
+		return result > 0;
+    }
+    
+    //This method must be used after the method startBooking has been called
+    public boolean endBooking(boolean doRollback) {
+    	return DBQueryHelper.endTransactionUpdate(doRollback);
     }
     
     public Theatre getTheatreForShow(Integer showId) {
