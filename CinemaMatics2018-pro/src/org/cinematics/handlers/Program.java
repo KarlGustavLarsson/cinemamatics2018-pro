@@ -194,26 +194,15 @@ public class Program {
 	public static void createShow(DataManager dataManager) {
 		Show show = new Show();
 		System.out.println("MOVIES: ");
-		Set<Movie> movies = dataManager.getAllMovies();
+		ArrayList<Movie> movies = dataManager.getAllMovies();
 		for(Movie movie : movies) {
 			System.out.println(movie.toString());
 		}
 		int movieId = UserInterface.enterMovieId();
-		if(movieId == Integer.MIN_VALUE) return;
-		for(Movie movie : movies) {
-			if(movie.getId() == movieId) {
-				Movie showMovie = movie;
-				show.setMovie(showMovie.getMovieIdCounter());
-				break;
-			}
-		}
-		if(show.getMovieId() != ) {
-			System.out.println("That movie id does not exist");
-			return;
-		}
+		
 		System.out.println("Theatres: ");
 		
-		List<Theatre> theatres = dataManager.getTheatres();
+		ArrayList<Theatre> theatres = dataManager.getAllTheatres();
 		
 		for (Theatre cT : theatres) {
 			System.out.println(cT.getName());
@@ -224,6 +213,7 @@ public class Program {
 			System.out.println("That theatre does not exist.");
 			return;
 		}
+		
 		System.out.println("Leave blank to exit");
 		
 		LocalDateTime startTime = UserInterface.readDate(null);
@@ -238,22 +228,26 @@ public class Program {
 			System.out.println("Start time must be strictly before end time");
 			return;
 		}
-		List<Show> shows = theatre.getAllShows();
-		List<Show> overlappingShows = new ArrayList<Show>();
-		for(Show currentShow : shows) {
-			if(currentShow.checkOverlap(startTime, endTime)) {
-				overlappingShows.add(currentShow);
-			}
-		}
-		if(!overlappingShows.isEmpty()) {
-			System.out.println("Show is overlapping with :");
-			overlappingShows.forEach(System.out::println);
-			return;
-		}
+//		//List<Show> shows = theatre.getAllShows();
+//		List<Show> overlappingShows = new ArrayList<Show>();
+//		for(Show currentShow : shows) {
+//			if(currentShow.checkOverlap(startTime, endTime)) {
+//				overlappingShows.add(currentShow);
+//			}
+//		}
+//		if(!overlappingShows.isEmpty()) {
+//			System.out.println("Show is overlapping with :");
+//			overlappingShows.forEach(System.out::println);
+//			return;
+//		}
 
 		show.setStart(startTime);
 		show.setEnd(endTime);
-		dataManager.addShowToTheatre(show, chosenTheatre);
+		show.setMovieId(movieId);
+		show.setTheatreId(dataManager.getTheatre(chosenTheatre).getId());
+		
+		dataManager.addShow(show);
+		
 	}
 
 	public static void viewAllShowInTheatre(DataManager dataManager) {
@@ -264,12 +258,8 @@ public class Program {
 			System.out.println("That theatre does not exist.");
 			return;
 		}
-		if(cT.getAllShows().isEmpty()) {
-			System.out.println("There are no shows");
-			return;
-		}
-		for(Show show : cT.getAllShows()) {
-			System.out.println(show.toString());
+		for(Show cS : dataManager.getShowInTheatre(cT.getId())) {
+			System.out.println("Movie:" + cS.getMovieId() + " Theatre:" + cS.getTheatreId() + " Start:" +cS.getStart() + " End:" + cS.getEnd());
 		}
 		
 	}
@@ -278,7 +268,9 @@ public class Program {
 		System.out.println("All shows:");
 		for (Theatre cT : dataManager.getTheatres()) {
 			System.out.println("-"+cT.toString());
-			for(Show show : cT.getAllShows()) {
+			//TODO fetch all shows in all theatres. 
+			
+			for(Show show : dataManager.getShowInTheatre(cT.getId())) {
 				System.out.println("---"+show.toString());
 			}
 			System.out.println("");

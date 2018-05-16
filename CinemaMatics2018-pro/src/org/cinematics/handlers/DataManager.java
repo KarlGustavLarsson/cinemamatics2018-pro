@@ -1,5 +1,6 @@
 package org.cinematics.handlers;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -28,14 +29,13 @@ public class DataManager {
 	}
 	
 	public Theatre getTheatre(String name) {
-		//TODO fetch from db
-		return theatres.get(name);
+		
+		return myDbh.getTheatreFromDb(name);
 	
 	}
 	
-	public Set<Movie> getAllMovies(){
-		//TODO fetch from db
-		return movies;
+	public ArrayList<Movie> getAllMovies(){
+		return myDbh.getAllMoviesFromDb();
 	}
 	
 	public boolean addMovie(Movie movie) {
@@ -46,21 +46,18 @@ public class DataManager {
 	}
 	
 	public List<Theatre> getTheatres(){
-		//TODO fetch from db
-		return 
+		
+		return myDbh.getAllTheatresFromDb();
+		
 	}
 	
 	public boolean addTheatre(Theatre theatre) {
 		return myDbh.saveTheatreToDb(theatre);
 	}
 	
-	public boolean addShowToTheatre(Show show, String theatreName) {
-		if(theatres.containsKey(theatreName)) {
-			Theatre theatre = theatres.get(theatreName);
-			theatre.addShow(show);
-			return true;
-		}
-		return false;
+	public boolean addShow(Show show) {
+		return myDbh.saveShowToDb(show);
+	
 	}
 
 	public boolean saveBooking(Booking booking, Integer row, Integer col, Integer showId, String theatreName) {
@@ -89,5 +86,15 @@ public class DataManager {
 		
 		return bookings.get(bookingId);
 	}
-	
+
+	public ArrayList<Theatre> getAllTheatres() {
+		
+		return myDbh.getAllTheatresFromDb();
+	}
+
+	public ArrayList<Show> getShowInTheatre(int id) {
+		
+		return myDbh.getShowInTheatre(id);
+	}
+
 }
