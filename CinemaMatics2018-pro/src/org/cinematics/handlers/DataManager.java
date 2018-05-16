@@ -27,41 +27,31 @@ public class DataManager {
 		
 	}
 	
-	
-	public void loadBookingsInDataManager() {
-		bookings = myDbh.loadBookingsFromDb(this);
-	}
-	public void loadShowsInDataManager() {
-		myDbh.loadShowsFromDb(this);
-	}
-	public void loadTheatresInDataManager() {
-		theatres = myDbh.loadTheatresFromDb();
-	}
 	public Theatre getTheatre(String name) {
-		
+		//TODO fetch from db
 		return theatres.get(name);
 	
 	}
 	
 	public Set<Movie> getAllMovies(){
+		//TODO fetch from db
 		return movies;
 	}
 	
 	public boolean addMovie(Movie movie) {
-		return movies.add(movie);
+		//TODO add to db
+		
+		
+		return myDbh.saveMovieToDb(movie);
 	}
 	
 	public List<Theatre> getTheatres(){
-		return theatres.values().stream().collect(Collectors.toList());
+		//TODO fetch from db
+		return 
 	}
 	
 	public boolean addTheatre(Theatre theatre) {
-		if(!theatres.containsKey(theatre.getName())) {
-			theatre.loadShowFromDb();
-			theatres.put(theatre.getName(), theatre);
-			return true;
-		}
-		return false;
+		return myDbh.saveTheatreToDb(theatre);
 	}
 	
 	public boolean addShowToTheatre(Show show, String theatreName) {

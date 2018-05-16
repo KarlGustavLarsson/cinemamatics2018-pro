@@ -2,34 +2,34 @@ package org.cinematics.model;
 
 public class Booking {
 	
-	private static int BOOKING_COUNTER = 0;
+	
 	private int bookingId;
-	private Customer myCust;
-	private Show myShow;
+	private int showId;
+	private int customerId;
 	
 	public Booking() {
-		bookingId = BOOKING_COUNTER;
-		BOOKING_COUNTER++;
 	}
 	public Booking(int id) {
 		bookingId = id;
 	}
 		
-	public void setCustomer(Customer c) {
-		myCust = c;
+	public void setCustomerId(int custId) {
+		this.customerId = custId;
 	}
-	public Customer getCustomer() {
-		return myCust;
-	}
-	
-	public void setShow(Show s) {
-		myShow = s;
-	}
-	public Show getShow() {
-		return myShow;
+	public int getCustomerId() {
+		return customerId;
 	}
 	
+	public void setShowId(int showId) {
+		this.showId = showId;
+	}
+	public int getShowId() {
+		return this.showId;
+	}
+	public void setBookingId(int bookingId) {
+		this.bookingId = bookingId;
+	}
 	public int getBookingId() {
-		return bookingId;
+		return this.bookingId;
 	}
 }

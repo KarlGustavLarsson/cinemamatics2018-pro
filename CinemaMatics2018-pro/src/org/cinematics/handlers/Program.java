@@ -17,9 +17,7 @@ public class Program {
 	public static void main(String[] args) {
 		boolean done = false;
 		DataManager dataManager = new DataManager();
-		DataBaseHandler  myDbHandler = new DataBaseHandler();
 		UserInterface ui = new UserInterface();
-		setup(dataManager);
 		
 		while(!done) {
 			
@@ -50,9 +48,7 @@ public class Program {
 				break;
 				
 			case 8:
-				dataManager.loadTheatresInDataManager();
-				dataManager.loadShowsInDataManager();
-				dataManager.loadBookingsInDataManager();
+				// testing
 				
 				break;
 			default:
@@ -61,11 +57,6 @@ public class Program {
 		}
 	}
 	
-	public static void setup(DataManager dataManager) {
-
-
-	}
-
 	public static void addMovie(DataManager dataManager) {
 		Movie movie = new Movie();
 		System.out.println("Add movie title(leave blank to exit):");
@@ -90,7 +81,9 @@ public class Program {
 		if(name.equals("")) {
 			return;
 		}
-		if(dataManager.addTheatre(new Theatre(name))){
+		Theatre cTheatre = new Theatre();
+		cTheatre.setName(name);
+		if(dataManager.addTheatre(cTheatre)){
 			System.out.println("The new theatre was added successfully");
 			return;
 		} else {

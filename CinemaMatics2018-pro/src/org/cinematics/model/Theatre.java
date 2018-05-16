@@ -8,42 +8,30 @@ import org.cinematics.handlers.DataBaseHandler;
 
 public class Theatre {
 	
-	
-	
-	private static final String String = null;
 	public static int SEAT_ROWS = 5;
 	public static int SEAT_COLS = 10;
-	private String name;						// The studio might have a name like "Blue Room"
-	private List<Show> shows;					// The show that is booked for the studio
+	private int id;
+	private String name;						
+												
 
 
+	public Theatre() {
+		
+	}
 	// Constructor
-	public Theatre(String name) {
+	public Theatre(int id, String name) {
+		this.id = id;
 		this.name = name;
-		shows = new ArrayList<>();
 	}
 
-	public List<Show> getAllShows() {
-		return shows;
+	
+	public void setId(int id) {
+		this.id = id;
 	}
-
-	public void loadShowFromDb() {
-		
-		DataBaseHandler dbH = new DataBaseHandler();
-		
-		
-		this.shows = dbH.loadShowFromDb(getId());
-		
-	}
-	public int getId() {
-		DataBaseHandler dbh = new DataBaseHandler();
-		return dbh.getTheatreId(this.name);
-		
+	public int getId(){
+		return this.id;
 	}
 	
-	public void addShow(Show s) {
-		shows.add(s);
-	}
 
 	/**
 	 * @return the name
@@ -56,25 +44,6 @@ public class Theatre {
 	 */
 	public void setName(String name) {
 		this.name = name;
-	}
-	
-	/**
-	 * @return the show
-	 */
-	public Show getShow(Integer id) {
-		for(Show show : shows) {
-			if(show.getId() == id) {
-				return show;
-			}
-		}
-		return null;
-	}
-	/**
-	 * @param show the show to set
-	 */
-	
-	public List<Show> getAllShowsInTheatre() {
-		return shows;
 	}
 	
 	@Override
