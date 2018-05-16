@@ -22,14 +22,9 @@ public class DataManager {
 	
 	DataBaseHandler myDbh = new DataBaseHandler();
 	
-	private Map<String, Theatre> theatres;
-	private Map<Integer, Booking> bookings;
-	private Set<Movie> movies;
 	
 	public DataManager() {
-		theatres = new TreeMap<String, Theatre>();
-		bookings = new TreeMap<Integer, Booking>();
-		movies = new TreeSet<Movie>(Comparator.comparing(Movie::getName));
+		
 	}
 	
 	

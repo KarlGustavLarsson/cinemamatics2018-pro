@@ -38,7 +38,6 @@ public class DataBaseHandler {
         catch (ClassNotFoundException e) {
 
             System.err.println (e);
-
             System.exit (-1);
 
         }
@@ -135,8 +134,10 @@ public class DataBaseHandler {
             	
             	Booking bookingToAdd = new Booking(rs.getInt("id"));
             	bookingToAdd.setCustomer(aCust);
-            
+            	// TODO add show to booking... 
+            	Show showToAdd = new Show();
             	
+            	bookingToAdd.setShow(loadShowFromDbToBooking(rs.getInt("show_id")));
             	bookingsToReturn.put(bookingToAdd.getBookingId(), bookingToAdd);
             	 
             }
@@ -149,6 +150,52 @@ public class DataBaseHandler {
         
         return bookingsToReturn; 	
     }
+    
+    
+    
+    public Show loadShowFromDbToBooking(int id) {
+    	List<Show> shows = new ArrayList<>();
+    	
+    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");	
+    	open();
+        try {
+            String query =
+                    "SELECT * FROM show WHERE id = " + id + ";";
+            
+            // execute query
+
+            Statement statement = conn.createStatement ();
+
+            ResultSet rs = statement.executeQuery (query);
+            
+            
+            while ( rs.next () ){
+            	
+            	LocalDateTime startT = LocalDateTime.parse((rs.getString("starttime")), formatter);
+            	LocalDateTime endT = LocalDateTime.parse((rs.getString("endtime")), formatter);
+            	
+            	Show showToAdd = new Show(rs.getInt("id"), startT, endT, getMovieFromDb(rs.getInt("movie_id")));
+            	// add bookings from database...
+            	DataManager dmg = new DataManager();
+            	
+            	shows.add(showToAdd);
+            	
+            }
+
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+        } finally {
+            close();
+        }
+        for (Show cShow : shows) {
+        	System.out.println(cShow.getId() + " " + cShow.getMovie().getName());
+        }
+        return shows.get(0);
+    	
+    }
+    
+    
+    
     public Booking[][] loadTicketsFromDb(int bookingID, Customer cust) {
 		
     	Booking[][] bookings = new Booking[Theatre.SEAT_ROWS][Theatre.SEAT_COLS];
@@ -266,8 +313,6 @@ public class DataBaseHandler {
             
             
             Statement statement = conn.createStatement ();
-            
-            
             ResultSet rs = statement.executeQuery (query);
             
             
@@ -283,18 +328,10 @@ public class DataBaseHandler {
             	
             	Statement statement2 = conn.createStatement ();
             	ResultSet rs2 = statement2.executeQuery (query2);
-            	
             		while (rs2.next()) {
-            			
             			Booking newBooking = dmgr.getBooking(rs2.getInt("id"));
-                    	dmgr.saveBooking(newBooking, rs.getInt("row"), rs.getInt("colum"), showToAdd.getId(), dmgr.getTheatreForShow(showToAdd.getId()).getName());
-                    	
+                    	dmgr.saveBooking(newBooking, rs.getInt("row"), rs.getInt("colum"), showToAdd.getId(), dmgr.getTheatreForShow(showToAdd.getId()).getName());	
             		}
-            	
-            	
-            	
-            	
-            	
             }
 
         } catch(SQLException e){
@@ -302,9 +339,7 @@ public class DataBaseHandler {
         } finally {
             close();
         }
-        for (Show cShow : shows) {
-        	System.out.println(cShow.getId() + " " + cShow.getMovie().getName());
-        }
+        
         return shows;
     	
     }
