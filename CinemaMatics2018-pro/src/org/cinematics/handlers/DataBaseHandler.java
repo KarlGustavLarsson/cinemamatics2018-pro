@@ -18,6 +18,7 @@ import org.cinematics.model.Customer;
 import org.cinematics.model.Movie;
 import org.cinematics.model.Show;
 import org.cinematics.model.Theatre;
+import org.cinematics.model.Ticket;
 
 public class DataBaseHandler {
 	Connection conn;
@@ -244,6 +245,138 @@ public class DataBaseHandler {
         return shows;
         
 	}
+
+	public Show getShowFromDb(int showId) {
+		
+		Show showToReturn = new Show();
+		
+		open();
+        try {
+        	
+            String query =
+            		"SELECT * FROM show where id = " + showId + ";"; 
+            
+            Statement statement = conn.createStatement ();
+            ResultSet rs = statement.executeQuery (query);
+            
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); 
+            
+            rs.next();
+            
+            showToReturn.setId(rs.getInt("id"));
+            showToReturn.setMovieId(rs.getInt("movie_id"));
+            showToReturn.setTheatreId(rs.getInt("theatre_id"));
+            LocalDateTime startT = LocalDateTime.parse((rs.getString("starttime")), formatter);
+        	LocalDateTime endT = LocalDateTime.parse((rs.getString("endtime")), formatter);
+            showToReturn.setStart(startT);
+            showToReturn.setEnd(endT);
+        }  
+       catch(SQLException e){
+            System.out.println(e.getMessage());
+        } 
+        finally {
+            close();
+        }
+        return showToReturn;
+	}
+
+	public ArrayList<Ticket> getAllTicketInShowFromDb(int showId) {
+		
+		ArrayList<Ticket> tickets = new ArrayList<>();
+		
+		open();
+        try {
+            String query =		
+            		"SELECT * FROM booking \r\n" + 
+            		"INNER JOIN ticket ON booking.id = ticket.booking_id where booking.show_id=" + showId + ";"; 
+          
+            Statement statement = conn.createStatement ();
+            ResultSet rs = statement.executeQuery (query);
+            
+            while (rs.next()) {
+            	Ticket ticketToAdd = new Ticket();
+            	ticketToAdd.setId(rs.getInt("id"));
+            	ticketToAdd.setBookingId(rs.getInt("booking_id"));
+            	ticketToAdd.setRow(rs.getInt("row"));
+            	ticketToAdd.setColum(rs.getInt("colum"));
+            	tickets.add(ticketToAdd);
+            }
+       }  
+       catch(SQLException e){
+            System.out.println(e.getMessage());
+        } 
+        finally {
+            close();
+        }
+        
+        return tickets;
+	}
+
+	public boolean saveTicket(Show show, Booking booking, int row, int colum) {
+		open();
+        try {
+            String query =		
+            		"INSERT INTO ticket (booking_id, row, colum)\r\n" + 
+            		"VALUES (" + booking.getBookingId() + ", " + row + ", " + colum + ");";
+            		
+            System.out.println(query);
+
+            Statement statement = conn.createStatement ();
+            ResultSet rs = statement.executeQuery (query);
+                   }  
+       catch(SQLException e){
+            System.out.println(e.getMessage());
+        } 
+        finally {
+            close();
+        }
+        //TODO fix check... 
+        return true;
+		
+	}
+
+	public int saveBooking(Booking booking) {
+		// TODO Auto-generated method stub
+		//save booking to db
+		int newBookingnr=-1;
+		open();
+        try {
+            String query =		
+            		"INSERT INTO booking (show_id, customer_id)\r\n" + 
+            		"VALUES (" + booking.getShowId() + ", " + booking.getCustomerId() + ";";
+            		
+            Statement statement = conn.createStatement ();
+            ResultSet rs = statement.executeQuery (query);
+            
+       }  
+       catch(SQLException e){
+            System.out.println(e.getMessage());
+        } 
+        finally {
+            close();
+        }
+        
+        open();
+        try {
+            String query =		
+            		"SELECT MAX (id) FROM booking";
+            		
+            Statement statement = conn.createStatement ();
+            ResultSet rs = statement.executeQuery (query);
+            
+            rs.next();
+            newBookingnr = rs.getInt("id");
+       }  
+       catch(SQLException e){
+            System.out.println(e.getMessage());
+        } 
+        finally {
+            close();
+        }
+		
+		return newBookingnr;
+	}
+	
 		
 	
 }
