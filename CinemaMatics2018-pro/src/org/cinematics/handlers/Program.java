@@ -52,7 +52,7 @@ public class Program {
 				
 			case 8:
 				// testing
-				
+				//dataManager.areSeatsAvailable(selectedShow, numberOfSeats, startingRow, startingCol)
 				break;
 			default:
 				System.out.println("That is not a valid menu option");
@@ -105,14 +105,30 @@ public class Program {
 			for (Theatre cT : dataManager.getTheatres()) {
 				//print out seats in theatre..
 				for(Show show : dataManager.getShowInTheatre(cT.getId())) {
+					ArrayList<Ticket> tickets = dataManager.getAllTicketsInShow(show.getId());
 					System.out.println("showid:" + show.getId());
 					//print out seats....
-					for (Ticket cTicket: dataManager.getAllTicketsInShow(show.getId())) {
-						System.out.println("Row:" + cTicket.getRow() + " Colum:" + cTicket.getColum() );
+					
+					System.out.println("  0 1 2 3 4 5 6 7 8 9");
+					for	(int row = 0; row < 5; row++) {
+						System.out.print(row + " ");
+						for (int col = 0; col < 10; col++) {
+							boolean seatPrinted = false;
+							for (Ticket cTick : tickets) {
+								
+								if (cTick.getRow() == row && cTick.getColum() == col) {
+									System.out.print("X ");
+								seatPrinted = true;
+								}
+							}
+							if(!seatPrinted) {
+								System.out.print("O ");
+							}
+						}
+						System.out.println("");
 					}
 				}
 			}
-			
 			
 			//Choose show
 			int showId = UserInterface.getShowId();
@@ -144,7 +160,7 @@ public class Program {
 				int startingCol = UserInterface.chooseSeatCol();
 				if(startingCol == Integer.MIN_VALUE) return;
 				
-				if(dataManager.areSeatsAvailable()) {
+				if(dataManager.areSeatsAvailable(selectedShow, numberOfSeats, startingRow, startingCol)) {
 					//save booking
 					Booking myBooking = new Booking();
 					myBooking.setCustomerId(selectedCust.getCustId());
@@ -164,16 +180,41 @@ public class Program {
 			} 
 			//Booking seats separatly
 			else {
-				
-					int startingRow = UserInterface.chooseSeatRow();
-					if(startingRow == Integer.MIN_VALUE) return;
-					int startingCol = UserInterface.chooseSeatCol();
-					if(startingCol == Integer.MIN_VALUE) return;
-				}
-				
-				
-				System.out.println("Booking succeeded");
-				
+					ArrayList<Ticket> tickets = new ArrayList<>();
+					boolean allSeatsAvalible = true;
+					
+					
+					for (int noOfTickets = 0; noOfTickets < numberOfSeats; noOfTickets++) {
+						int startingRow = UserInterface.chooseSeatRow();
+						if(startingRow == Integer.MIN_VALUE) return;
+						int startingCol = UserInterface.chooseSeatCol();
+						if(startingCol == Integer.MIN_VALUE) return;
+						if (!dataManager.areSeatsAvailable(selectedShow, 1, startingRow, startingCol)) {
+							System.out.println("seat taken");
+							allSeatsAvalible = false;
+						}
+						Ticket ticketToAdd = new Ticket();
+						ticketToAdd.setRow(startingRow);
+						ticketToAdd.setColum(startingCol);
+						tickets.add(ticketToAdd);
+					}
+					
+					if (allSeatsAvalible) {
+						Booking myBooking = new Booking();
+						myBooking.setCustomerId(selectedCust.getCustId());
+						myBooking.setShowId(selectedShow.getId());
+						myBooking.setBookingId(dataManager.saveBooking(myBooking));
+						
+						for (Ticket cTicket : tickets) {
+							dataManager.saveTicket(selectedShow, myBooking, cTicket.getRow(), cTicket.getColum());
+						}
+						System.out.println("Booking successfull");
+						//put code for recipt here. 
+					}
+					else {
+						System.out.println("Booking not possible seats occupied");
+					}	
+				}	
 			}
 			doneWithBooking = true;
 		

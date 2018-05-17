@@ -102,8 +102,24 @@ public class DataManager {
 		return myDbh.getShowInTheatre(id);
 	}
 
-	public boolean areSeatsAvailable() {
-		// TODO Auto-generated method stub
+	public boolean areSeatsAvailable(Show selectedShow, int numberOfSeats, int startingRow, int startingCol) {
+		
+		ArrayList<Ticket> tickets = myDbh.getAllTicketInShowFromDb(selectedShow.getId());
+		
+		for (Ticket cTick : tickets) {
+			if (cTick.getRow() == startingRow) {
+				//on the same row
+				//
+				if (startingCol == cTick.getColum()) {
+					return false;
+				}
+				for (int col = startingCol; col < (startingCol + (numberOfSeats+1)); col++) {
+					if (cTick.getColum()==col) {
+						return false;
+					}
+				}	
+			}	
+		}	
 		return true;
 	}
 
