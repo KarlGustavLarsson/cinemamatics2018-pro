@@ -190,7 +190,6 @@ public class Program {
 						int startingCol = UserInterface.chooseSeatCol();
 						if(startingCol == Integer.MIN_VALUE) return;
 						if (!dataManager.areSeatsAvailable(selectedShow, 1, startingRow, startingCol)) {
-							System.out.println("seat taken");
 							allSeatsAvalible = false;
 						}
 						Ticket ticketToAdd = new Ticket();
@@ -217,7 +216,6 @@ public class Program {
 				}	
 			}
 			doneWithBooking = true;
-		
 	}
 	
 	public static void createShow(DataManager dataManager) {
