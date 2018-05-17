@@ -343,11 +343,14 @@ public class DataBaseHandler {
         try {
             String query =		
             		"INSERT INTO booking (show_id, customer_id)\r\n" + 
-            		"VALUES (" + booking.getShowId() + ", " + booking.getCustomerId() + ";";
-            		
+            		"VALUES (" + booking.getShowId() + ", " + booking.getCustomerId() + ");";		
             Statement statement = conn.createStatement ();
-            ResultSet rs = statement.executeQuery (query);
+            int update = statement.executeUpdate (query, Statement.RETURN_GENERATED_KEYS);
             
+            ResultSet rs2 = statement.getGeneratedKeys();
+            if (rs2 !=null && rs2.next()) {
+            	newBookingnr = rs2.getInt(update);
+            }
        }  
        catch(SQLException e){
             System.out.println(e.getMessage());
@@ -355,28 +358,6 @@ public class DataBaseHandler {
         finally {
             close();
         }
-        
-        open();
-        try {
-            String query =		
-            		"SELECT MAX (id) FROM booking";
-            		
-            Statement statement = conn.createStatement ();
-            ResultSet rs = statement.executeQuery (query);
-            
-            rs.next();
-            newBookingnr = rs.getInt("id");
-       }  
-       catch(SQLException e){
-            System.out.println(e.getMessage());
-        } 
-        finally {
-            close();
-        }
-		
-		return newBookingnr;
+        return newBookingnr;    
 	}
-	
-		
-	
 }

@@ -69,23 +69,11 @@ public class DataManager {
 		return myDbh.saveBooking(booking);
 	}
 	public boolean saveTicket(Show show, Booking booking, int row, int colum) {
-
 		return myDbh.saveTicket(show, booking, row, colum);
-//	public boolean saveBooking(Booking booking, Integer row, Integer col, Integer showId, String theatreName) {
-//		if(theatres.containsKey(theatreName)) {
-//			Theatre theatre = theatres.get(theatreName);
-//			Show show = theatre.getShow(showId);
-//			show.getBookings()[row][col] = booking;
-//			bookings.put(booking.getBookingId(), booking);
-//			return true;
-//		}
-//		return false;
+
 	}
 	public ArrayList<Ticket> getAllTicketsInShow(int showId){
-		
 		return myDbh.getAllTicketInShowFromDb(showId);
-		
-		
 	}
 	
 	public Theatre getTheatreForShow(Integer showId) {

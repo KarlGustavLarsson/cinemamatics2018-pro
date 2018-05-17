@@ -150,8 +150,7 @@ public class Program {
 					myBooking.setCustomerId(selectedCust.getCustId());
 					myBooking.setShowId(selectedShow.getId());
 					myBooking.setBookingId(dataManager.saveBooking(myBooking));
-					
-					// 
+		
 					//Save tickets
 					for (int i = 0; i < numberOfSeats; i++) {
 						dataManager.saveTicket(selectedShow, myBooking, startingRow, startingCol + i);
@@ -166,7 +165,7 @@ public class Program {
 			//Booking seats separatly
 			else {
 				
-				int startingRow = UserInterface.chooseSeatRow();
+					int startingRow = UserInterface.chooseSeatRow();
 					if(startingRow == Integer.MIN_VALUE) return;
 					int startingCol = UserInterface.chooseSeatCol();
 					if(startingCol == Integer.MIN_VALUE) return;
