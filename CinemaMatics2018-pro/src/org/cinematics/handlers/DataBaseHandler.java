@@ -45,6 +45,7 @@ public class DataBaseHandler {
             System.exit (-1);
         }
     }
+    
     private void close() {
         try {
             conn.close();
@@ -54,7 +55,6 @@ public class DataBaseHandler {
     }
 
     public boolean saveMovieToDb(Movie cMovie) {
-    	
     	open();
         try {
             String query =
@@ -70,7 +70,6 @@ public class DataBaseHandler {
         finally {
             close();
         }
-      //TODO fix check
         return true;
     }
     
@@ -90,7 +89,6 @@ public class DataBaseHandler {
         finally {
             close();
         }
-        //TODO fix check
         return true;
     }
     
@@ -162,8 +160,7 @@ public class DataBaseHandler {
             	movieToAdd.setId(rs.getInt("id"));
             	movieToAdd.setName(rs.getString("name"));
             	movieToAdd.setDescription(rs.getString("description"));
-            	movies.add(movieToAdd);
-            	
+            	movies.add(movieToAdd);       	
             }
         }  
        catch(SQLException e){
@@ -171,30 +168,20 @@ public class DataBaseHandler {
         } 
         finally {
             close();
-        }
-    	
-    	return movies;
-    	
+        }	
+    	return movies;	
     }
 
-	
-    
-    
-    
-    
     public boolean saveShowToDb(Show show) {
-		//TODO remember to check if possible to save...   
+		
     	open();
         try {
         	
         	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); 
-//            LocalDateTime startT = LocalDateTime.parse((rs.getString("starttime")), formatter);
-//            LocalDateTime endT = LocalDateTime.parse((rs.getString("endtime")), formatter);
-//            
+           
             String query =
             		"INSERT INTO show (movie_id, theatre_id, starttime, endtime)\r\n" + 
-            		"VALUES (" + show.getMovieId() + ", " + show.getTheatreId() + ", '" + show.getStart().format(formatter) + "', '" + show.getEnd().format(formatter) + "');";
-            System.out.println(query);        
+            		"VALUES (" + show.getMovieId() + ", " + show.getTheatreId() + ", '" + show.getStart().format(formatter) + "', '" + show.getEnd().format(formatter) + "');";      
             Statement statement = conn.createStatement ();
             ResultSet rs = statement.executeQuery (query);
         }  
@@ -204,19 +191,16 @@ public class DataBaseHandler {
         finally {
             close();
         }
-      //TODO fix check
         return true;
     }
 
-	public ArrayList<Show> getShowInTheatre(int id) {
-		
+	public ArrayList<Show> getShowInTheatre(int id) {	
 		ArrayList<Show> shows = new ArrayList<>();
-		
 		open();
         try {
-        	
             String query =
             		"SELECT * FROM show where theatre_id = " + id + ";"; 
+           
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); 
             
             Statement statement = conn.createStatement ();
@@ -243,13 +227,10 @@ public class DataBaseHandler {
             close();
         }
         return shows;
-        
 	}
 
 	public Show getShowFromDb(int showId) {
-		
 		Show showToReturn = new Show();
-		
 		open();
         try {
         	
@@ -283,7 +264,6 @@ public class DataBaseHandler {
 	public ArrayList<Ticket> getAllTicketInShowFromDb(int showId) {
 		
 		ArrayList<Ticket> tickets = new ArrayList<>();
-		
 		open();
         try {
             String query =		
@@ -311,16 +291,13 @@ public class DataBaseHandler {
         
         return tickets;
 	}
-
+	
 	public boolean saveTicket(Show show, Booking booking, int row, int colum) {
 		open();
         try {
             String query =		
             		"INSERT INTO ticket (booking_id, row, colum)\r\n" + 
             		"VALUES (" + booking.getBookingId() + ", " + row + ", " + colum + ");";
-            		
-            System.out.println(query);
-
             Statement statement = conn.createStatement ();
             ResultSet rs = statement.executeQuery (query);
                    }  
@@ -359,5 +336,80 @@ public class DataBaseHandler {
             close();
         }
         return newBookingnr;    
+	}
+
+	public boolean checkIfShowOverlapsDb(Show show) {
+		
+		boolean showOverlaps = false;
+		open();
+        try {
+            String query =	
+            		//get all shows where starttime or endtime is within the new show
+            		"SELECT * FROM show WHERE theatre_id = " + show.getTheatreId() + " and starttime "
+            		+ "between '" + show.getStart() + "' and '" + show.getEnd()+ "' or"
+            		+ " endtime between '"+  show.getStart() + "' and '" + show.getEnd() +"';";
+            		
+            Statement statement = conn.createStatement ();
+            
+            ResultSet rs = statement.executeQuery (query);
+            showOverlaps = rs.next();
+            
+       }  
+       catch(SQLException e){
+            System.out.println(e.getMessage());
+        } 
+        finally {
+            close();
+        }
+        if (checkIfShowEatsUp(show)) {
+        	showOverlaps = true;
+        }
+        return showOverlaps;    	
+	}
+	
+	private boolean checkIfShowEatsUp(Show show) {
+		boolean showOverlaps = false;
+		open();
+        try {
+            String query =	
+            		//get all shows where starttime or endtime is within the new show
+            		"SELECT * FROM show WHERE theatre_id = " + show.getTheatreId() + " and starttime <'"
+            		+ show.getStart() + "' and  endtime >'" + show.getEnd()+ "';";
+            Statement statement = conn.createStatement ();
+            ResultSet rs = statement.executeQuery (query);
+            showOverlaps = rs.next();
+       }  
+       catch(SQLException e){
+            System.out.println(e.getMessage());
+        } 
+        finally {
+            close();
+        }
+        return showOverlaps; 
+	}
+
+	public Movie getMovie(int movieId) {
+		Movie movieToReturn = new Movie();
+		open();
+        try {
+            String query = "SELECT * FROM movie WHERE id=" + movieId;	
+            		
+            Statement statement = conn.createStatement ();
+            ResultSet rs = statement.executeQuery (query);
+            
+            rs.next();
+            
+            movieToReturn.setId(rs.getInt("id"));
+            movieToReturn.setName(rs.getString("name"));
+            movieToReturn.setDescription(rs.getString("description"));		
+       }  
+       catch(SQLException e){
+            System.out.println(e.getMessage());
+        } 
+        finally {
+            close();
+        }
+        return movieToReturn; 
+	
 	}
 }

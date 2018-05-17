@@ -25,15 +25,16 @@ public class DataManager {
 	
 	DataBaseHandler myDbh = new DataBaseHandler();
 	
+	public boolean checkIfShowOverlaps(Show show) {
+		return myDbh.checkIfShowOverlapsDb(show);
+	}
 	
 	public DataManager() {
 		
 	}
 	
 	public Theatre getTheatre(String name) {
-		
 		return myDbh.getTheatreFromDb(name);
-	
 	}
 	
 	public ArrayList<Movie> getAllMovies(){
@@ -41,16 +42,11 @@ public class DataManager {
 	}
 	
 	public boolean addMovie(Movie movie) {
-		//TODO add to db
-		
-		
 		return myDbh.saveMovieToDb(movie);
 	}
 	
 	public List<Theatre> getTheatres(){
-		
 		return myDbh.getAllTheatresFromDb();
-		
 	}
 	
 	public boolean addTheatre(Theatre theatre) {
@@ -59,7 +55,6 @@ public class DataManager {
 	
 	public boolean addShow(Show show) {
 		return myDbh.saveShowToDb(show);
-	
 	}
 	
 	public Show getShow(int showId) {
@@ -70,40 +65,25 @@ public class DataManager {
 	}
 	public boolean saveTicket(Show show, Booking booking, int row, int colum) {
 		return myDbh.saveTicket(show, booking, row, colum);
-
 	}
 	public ArrayList<Ticket> getAllTicketsInShow(int showId){
 		return myDbh.getAllTicketInShowFromDb(showId);
 	}
 	
-	public Theatre getTheatreForShow(Integer showId) {
-		for(Theatre theatre : getTheatres()) {
-			for(Show show : theatre.getAllShows()) {
-				if(show.getId() == showId) {
-					return theatre;
-				}
-			}
-		}
-		return null;
-	}
-	
+
 	public Booking getBooking(Integer bookingId) {
-		
 		return bookings.get(bookingId);
 	}
 
-	public ArrayList<Theatre> getAllTheatres() {
-		
+	public ArrayList<Theatre> getAllTheatres() {	
 		return myDbh.getAllTheatresFromDb();
 	}
 
-	public ArrayList<Show> getShowInTheatre(int id) {
-		
+	public ArrayList<Show> getShowInTheatre(int id) {	
 		return myDbh.getShowInTheatre(id);
 	}
 
 	public boolean areSeatsAvailable(Show selectedShow, int numberOfSeats, int startingRow, int startingCol) {
-		
 		ArrayList<Ticket> tickets = myDbh.getAllTicketInShowFromDb(selectedShow.getId());
 		
 		for (Ticket cTick : tickets) {
@@ -121,6 +101,9 @@ public class DataManager {
 			}	
 		}	
 		return true;
+	}
+	public Movie getMovie(int movieId) {
+		return myDbh.getMovie(movieId);
 	}
 
 }

@@ -52,7 +52,6 @@ public class Program {
 				
 			case 8:
 				// testing
-				//dataManager.areSeatsAvailable(selectedShow, numberOfSeats, startingRow, startingCol)
 				break;
 			default:
 				System.out.println("That is not a valid menu option");
@@ -61,6 +60,7 @@ public class Program {
 	}
 	
 	public static void addMovie(DataManager dataManager) {
+		
 		Movie movie = new Movie();
 		System.out.println("Add movie title(leave blank to exit):");
 		String title = UserInterface.getUserInputString();
@@ -99,7 +99,6 @@ public class Program {
 		boolean doneWithBooking = false; 
 		while(!doneWithBooking) {
 			//Printing out all shows and avalible seats
-			//System.out.println("Choice "+choice+" please");
 			
 			//print out theater
 			for (Theatre cT : dataManager.getTheatres()) {
@@ -107,8 +106,8 @@ public class Program {
 				for(Show show : dataManager.getShowInTheatre(cT.getId())) {
 					ArrayList<Ticket> tickets = dataManager.getAllTicketsInShow(show.getId());
 					System.out.println("showid:" + show.getId());
-					//print out seats....
 					
+					//print out seats....
 					System.out.println("  0 1 2 3 4 5 6 7 8 9");
 					for	(int row = 0; row < 5; row++) {
 						System.out.print(row + " ");
@@ -136,6 +135,7 @@ public class Program {
 			Customer selectedCust = new Customer();
 			selectedCust.setCustId(1);
 			selectedCust.setName("kunden");
+			
 			//choose number of seats.. 
 			int numberOfSeats = UserInterface.chooseNumberOfSeats();
 			if(numberOfSeats == Integer.MIN_VALUE) return;
@@ -178,12 +178,12 @@ public class Program {
 					continue;
 				}	
 			} 
-			//Booking seats separatly
+			//Booking seats separately
 			else {
 					ArrayList<Ticket> tickets = new ArrayList<>();
 					boolean allSeatsAvalible = true;
 					
-					
+					//prepare booking
 					for (int noOfTickets = 0; noOfTickets < numberOfSeats; noOfTickets++) {
 						int startingRow = UserInterface.chooseSeatRow();
 						if(startingRow == Integer.MIN_VALUE) return;
@@ -197,7 +197,7 @@ public class Program {
 						ticketToAdd.setColum(startingCol);
 						tickets.add(ticketToAdd);
 					}
-					
+					//comitt to booking
 					if (allSeatsAvalible) {
 						Booking myBooking = new Booking();
 						myBooking.setCustomerId(selectedCust.getCustId());
@@ -255,26 +255,17 @@ public class Program {
 			System.out.println("Start time must be strictly before end time");
 			return;
 		}
-//		//List<Show> shows = theatre.getAllShows();
-//		List<Show> overlappingShows = new ArrayList<Show>();
-//		for(Show currentShow : shows) {
-//			if(currentShow.checkOverlap(startTime, endTime)) {
-//				overlappingShows.add(currentShow);
-//			}
-//		}
-//		if(!overlappingShows.isEmpty()) {
-//			System.out.println("Show is overlapping with :");
-//			overlappingShows.forEach(System.out::println);
-//			return;
-//		}
-
+		
 		show.setStart(startTime);
 		show.setEnd(endTime);
 		show.setMovieId(movieId);
 		show.setTheatreId(dataManager.getTheatre(chosenTheatre).getId());
-		
-		dataManager.addShow(show);
-		
+		if (!dataManager.checkIfShowOverlaps(show)) {
+			dataManager.addShow(show);
+		}
+		else {
+			System.out.println("Show overlaps");
+		}
 	}
 
 	public static void viewAllShowInTheatre(DataManager dataManager) {
@@ -299,6 +290,7 @@ public class Program {
 			
 			for(Show show : dataManager.getShowInTheatre(cT.getId())) {
 				System.out.println("---"+show.toString());
+				
 			}
 			System.out.println("");
 		}
