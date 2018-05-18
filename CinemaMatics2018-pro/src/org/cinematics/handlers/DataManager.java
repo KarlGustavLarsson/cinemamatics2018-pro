@@ -15,12 +15,7 @@ import org.cinematics.model.Movie;
 import org.cinematics.model.Show;
 import org.cinematics.model.Theatre;
 import org.cinematics.model.Ticket;
-/**
- * This class should be used to store all data that the cinema program needs
- * 
- *
- */
-//TEST
+
 public class DataManager {
 	
 	DataBaseHandler myDbh = new DataBaseHandler();
@@ -88,7 +83,7 @@ public class DataManager {
 				if (startingCol == cTick.getColum()) {
 					return false;
 				}
-				for (int col = startingCol; col < (startingCol + (numberOfSeats+1)); col++) {
+				for (int col = startingCol; col < (startingCol + (numberOfSeats)); col++) {
 					if (cTick.getColum()==col) {
 						return false;
 					}

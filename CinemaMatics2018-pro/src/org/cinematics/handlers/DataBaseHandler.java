@@ -309,7 +309,7 @@ public class DataBaseHandler {
         finally {
             close();
         }
-        //TODO fix check... 
+        
         return true;
 		
 	}
