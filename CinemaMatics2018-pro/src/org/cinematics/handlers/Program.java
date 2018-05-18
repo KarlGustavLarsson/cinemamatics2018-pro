@@ -133,6 +133,10 @@ public class Program {
 			//Choose show
 			int showId = UserInterface.getShowId();
 			Show selectedShow = dataManager.getShow(showId);
+			if (selectedShow == null) {
+				System.out.println("Show does not exist");
+				return;
+			}
 			Customer selectedCust = new Customer();
 			selectedCust.setCustId(1);
 			selectedCust.setName("kunden");
@@ -161,7 +165,7 @@ public class Program {
 				int startingCol = UserInterface.chooseSeatCol();
 				if(startingCol == Integer.MIN_VALUE) return;
 				
-				if(dataManager.areSeatsAvailable(selectedShow, numberOfSeats, startingRow, startingCol)) {
+				if(dataManager.seatsExist(selectedShow,  numberOfSeats, startingRow, startingCol) && dataManager.areSeatsAvailable(selectedShow, numberOfSeats, startingRow, startingCol)) {
 					//save booking
 					Booking myBooking = new Booking();
 					myBooking.setCustomerId(selectedCust.getCustId());
@@ -175,7 +179,7 @@ public class Program {
 					
 					break;
 				} else {
-					System.out.println("Those seats are not available");
+					System.out.println("Those seats do not exist or is occupied");
 					continue;
 				}	
 			} 
@@ -184,13 +188,18 @@ public class Program {
 					ArrayList<Ticket> tickets = new ArrayList<>();
 					boolean allSeatsAvalible = true;
 					
+					int startingRow = Integer.MIN_VALUE;
+					int startingCol = Integer.MIN_VALUE;
 					//prepare booking
 					for (int noOfTickets = 0; noOfTickets < numberOfSeats; noOfTickets++) {
-						int startingRow = UserInterface.chooseSeatRow();
+						startingRow = UserInterface.chooseSeatRow();
 						if(startingRow == Integer.MIN_VALUE) return;
-						int startingCol = UserInterface.chooseSeatCol();
+						startingCol = UserInterface.chooseSeatCol();
 						if(startingCol == Integer.MIN_VALUE) return;
 						if (!dataManager.areSeatsAvailable(selectedShow, 1, startingRow, startingCol)) {
+							allSeatsAvalible = false;
+						}
+						if (!dataManager.seatsExist(selectedShow, 1, startingRow, startingCol)) {
 							allSeatsAvalible = false;
 						}
 						Ticket ticketToAdd = new Ticket();
@@ -212,7 +221,7 @@ public class Program {
 						//put code for recipt here. 
 					}
 					else {
-						System.out.println("Booking not possible seats occupied");
+						System.out.println("Those seats do not exist or is occupied");
 					}	
 				}	
 			}

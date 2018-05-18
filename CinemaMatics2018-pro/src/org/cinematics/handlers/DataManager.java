@@ -58,8 +58,9 @@ public class DataManager {
 	public int saveBooking(Booking booking) {
 		return myDbh.saveBooking(booking);
 	}
-	public boolean saveTicket(Show show, Booking booking, int row, int colum) {
-		return myDbh.saveTicket(show, booking, row, colum);
+	public void saveTicket(Show show, Booking booking, int row, int colum) {
+		myDbh.saveTicket(show, booking, row, colum);
+		return; 
 	}
 	public ArrayList<Ticket> getAllTicketsInShow(int showId){
 		return myDbh.getAllTicketInShowFromDb(showId);
@@ -79,7 +80,6 @@ public class DataManager {
 		for (Ticket cTick : tickets) {
 			if (cTick.getRow() == startingRow) {
 				//on the same row
-				//
 				if (startingCol == cTick.getColum()) {
 					return false;
 				}
@@ -95,5 +95,20 @@ public class DataManager {
 	public Movie getMovie(int movieId) {
 		return myDbh.getMovie(movieId);
 	}
+
+	public boolean seatsExist(Show selectedShow, int numberOfSeats, int startingRow, int startingCol) {
+		boolean seatExists = true;
+		if (startingRow < 0 || startingRow > Theatre.SEAT_ROWS) {
+			seatExists = false;
+		}
+		for (int col = startingCol; col < startingCol + numberOfSeats; col++) {
+			if (0 > col || col > Theatre.SEAT_COLS) {
+				seatExists = false;
+			}
+		}
+		
+		return seatExists;
+	}
+	
 
 }

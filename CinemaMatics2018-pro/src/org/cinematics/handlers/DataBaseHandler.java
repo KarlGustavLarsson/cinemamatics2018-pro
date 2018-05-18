@@ -62,7 +62,7 @@ public class DataBaseHandler {
             		"VALUES ('" + cMovie.getName() + "', '" + cMovie.getDescription() + "');";
                     
             Statement statement = conn.createStatement ();
-            ResultSet rs = statement.executeQuery (query);
+            statement.executeQuery (query);
         }  
        catch(SQLException e){
             System.out.println(e.getMessage());
@@ -81,7 +81,7 @@ public class DataBaseHandler {
             		"VALUES ('" + cTheatre.getName() + "');";
                     
             Statement statement = conn.createStatement ();
-            ResultSet rs = statement.executeQuery (query);
+            statement.executeQuery (query);
         } 
        catch(SQLException e){
             System.out.println(e.getMessage());
@@ -185,7 +185,7 @@ public class DataBaseHandler {
             		"INSERT INTO show (movie_id, theatre_id, starttime, endtime)\r\n" + 
             		"VALUES (" + show.getMovieId() + ", " + show.getTheatreId() + ", '" + show.getStart().format(formatter) + "', '" + show.getEnd().format(formatter) + "');";      
             Statement statement = conn.createStatement ();
-            ResultSet rs = statement.executeQuery (query);
+            statement.executeQuery (query);
         }  
        catch(SQLException e){
             System.out.println(e.getMessage());
@@ -232,7 +232,7 @@ public class DataBaseHandler {
 	}
 
 	public Show getShowFromDb(int showId) {
-		Show showToReturn = new Show();
+		Show showToReturn = null;
 		open();
         try {
         	
@@ -244,15 +244,18 @@ public class DataBaseHandler {
             
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); 
             
-            rs.next();
+            if (rs.next()) {
+            	showToReturn = new Show();
+            	showToReturn.setId(rs.getInt("id"));
+                showToReturn.setMovieId(rs.getInt("movie_id"));
+                showToReturn.setTheatreId(rs.getInt("theatre_id"));
+                LocalDateTime startT = LocalDateTime.parse((rs.getString("starttime")), formatter);
+            	LocalDateTime endT = LocalDateTime.parse((rs.getString("endtime")), formatter);
+                showToReturn.setStart(startT);
+                showToReturn.setEnd(endT);	
+            }
             
-            showToReturn.setId(rs.getInt("id"));
-            showToReturn.setMovieId(rs.getInt("movie_id"));
-            showToReturn.setTheatreId(rs.getInt("theatre_id"));
-            LocalDateTime startT = LocalDateTime.parse((rs.getString("starttime")), formatter);
-        	LocalDateTime endT = LocalDateTime.parse((rs.getString("endtime")), formatter);
-            showToReturn.setStart(startT);
-            showToReturn.setEnd(endT);
+            
         }  
        catch(SQLException e){
             System.out.println(e.getMessage());
@@ -294,14 +297,14 @@ public class DataBaseHandler {
         return tickets;
 	}
 	
-	public boolean saveTicket(Show show, Booking booking, int row, int colum) {
+	public void saveTicket(Show show, Booking booking, int row, int colum) {
 		open();
         try {
             String query =		
             		"INSERT INTO ticket (booking_id, row, colum)\r\n" + 
             		"VALUES (" + booking.getBookingId() + ", " + row + ", " + colum + ");";
             Statement statement = conn.createStatement ();
-            ResultSet rs = statement.executeQuery (query);
+            statement.executeQuery (query);
                    }  
        catch(SQLException e){
             System.out.println(e.getMessage());
@@ -309,9 +312,7 @@ public class DataBaseHandler {
         finally {
             close();
         }
-        
-        return true;
-		
+        return;
 	}
 
 	public int saveBooking(Booking booking) {
@@ -353,8 +354,9 @@ public class DataBaseHandler {
             		
             Statement statement = conn.createStatement ();
             ResultSet rs = statement.executeQuery (query);
-            showOverlaps = rs.next();
-           
+            if (rs.next()) {
+            	showOverlaps = true;
+            }
        }  
        catch(SQLException e){
             System.out.println(e.getMessage());
@@ -362,8 +364,7 @@ public class DataBaseHandler {
         finally {
             close();
         }
-        if (checkIfShowEatsUp(show)) {
-        	
+        if (checkIfShowEatsUp(show)) {	
         	showOverlaps = true;
         }
         if (checkEndtime(show)) {
@@ -383,7 +384,10 @@ public class DataBaseHandler {
             		
             Statement statement = conn.createStatement ();
             ResultSet rs = statement.executeQuery (query);
-            showOverlaps = rs.next();
+            if (rs.next()) {
+            	showOverlaps = true;
+            }
+            
            
        }  
        catch(SQLException e){
@@ -404,7 +408,9 @@ public class DataBaseHandler {
             		+ show.getStart() + "' and  endtime >'" + show.getEnd()+ "';";
             Statement statement = conn.createStatement ();
             ResultSet rs = statement.executeQuery (query);
-            showOverlaps = rs.next();
+            if (rs.next()) {
+            	showOverlaps = true;
+            }
        }  
        catch(SQLException e){
             System.out.println(e.getMessage());
@@ -416,7 +422,7 @@ public class DataBaseHandler {
 	}
 
 	public Movie getMovie(int movieId) {
-		Movie movieToReturn = new Movie();
+		Movie movieToReturn = null;
 		open();
         try {
             String query = "SELECT * FROM movie WHERE id=" + movieId;	
@@ -424,12 +430,13 @@ public class DataBaseHandler {
             Statement statement = conn.createStatement ();
             ResultSet rs = statement.executeQuery (query);
             
-            rs.next();
-            
-            movieToReturn.setId(rs.getInt("id"));
-            movieToReturn.setName(rs.getString("name"));
-            movieToReturn.setDescription(rs.getString("description"));		
-       }  
+            if (rs.next()) {
+            	movieToReturn = new Movie();
+            	movieToReturn.setId(rs.getInt("id"));
+            	movieToReturn.setName(rs.getString("name"));
+            	movieToReturn.setDescription(rs.getString("description"));		
+            }
+        }  
        catch(SQLException e){
             System.out.println(e.getMessage());
         } 
