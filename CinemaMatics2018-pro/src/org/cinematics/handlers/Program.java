@@ -8,7 +8,6 @@ import org.cinematics.exceptions.OutOfSeatingBoundsException;
 import org.cinematics.model.Booking;
 import org.cinematics.model.Customer;
 import org.cinematics.model.Movie;
-import org.cinematics.model.Seat;
 import org.cinematics.model.Show;
 import org.cinematics.model.Theatre;
 import org.cinematics.model.Ticket;

@@ -70,11 +70,6 @@ public class DataManager {
 		return myDbh.getAllTicketInShowFromDb(showId);
 	}
 	
-
-	public Booking getBooking(Integer bookingId) {
-		return bookings.get(bookingId);
-	}
-
 	public ArrayList<Theatre> getAllTheatres() {	
 		return myDbh.getAllTheatresFromDb();
 	}
