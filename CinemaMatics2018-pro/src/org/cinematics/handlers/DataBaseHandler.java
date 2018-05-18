@@ -342,6 +342,7 @@ public class DataBaseHandler {
 
 	public boolean checkIfShowOverlapsDb(Show show) {
 		
+		//boolean to help with stuff
 		boolean showOverlaps = false;
 		open();
         try {
