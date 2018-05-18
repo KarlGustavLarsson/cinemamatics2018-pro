@@ -315,7 +315,7 @@ public class DataBaseHandler {
 	}
 
 	public int saveBooking(Booking booking) {
-		// TODO Auto-generated method stub
+		
 		//save booking to db
 		int newBookingnr=-1;
 		open();
