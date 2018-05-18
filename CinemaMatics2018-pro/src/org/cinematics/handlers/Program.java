@@ -227,6 +227,20 @@ public class Program {
 		}
 		int movieId = UserInterface.enterMovieId();
 		
+		boolean movieExist = false;
+		//check if selected movie exists
+		for(Movie cMovie : movies) {
+			if (movieId == cMovie.getId()){
+				movieExist = true;
+			}
+			
+					
+		}
+		if (!movieExist) {
+			System.out.println("Movie does not exist");
+			return;
+		}
+		
 		System.out.println("Theatres: ");
 		
 		ArrayList<Theatre> theatres = dataManager.getAllTheatres();
@@ -269,6 +283,12 @@ public class Program {
 	}
 
 	public static void viewAllShowInTheatre(DataManager dataManager) {
+		//Print out all theatres
+		ArrayList<Theatre> theatres = dataManager.getAllTheatres();
+		for (Theatre cTheatre : theatres) {
+			System.out.println(cTheatre.getName());
+		}
+		
 		String theatreName = UserInterface.getTheatreName();
 		Theatre cT = dataManager.getTheatre(theatreName);
 		
@@ -277,7 +297,7 @@ public class Program {
 			return;
 		}
 		for(Show cS : dataManager.getShowInTheatre(cT.getId())) {
-			System.out.println("Movie:" + cS.getMovieId() + " Theatre:" + cS.getTheatreId() + " Start:" +cS.getStart() + " End:" + cS.getEnd());
+			System.out.println("Movie:" + dataManager.getMovie(cS.getMovieId()).getName() + " Theatre:" + cS.getTheatreId() + " Start:" +cS.getStart() + " End:" + cS.getEnd());
 		}
 		
 	}
@@ -289,8 +309,7 @@ public class Program {
 			//TODO fetch all shows in all theatres. 
 			
 			for(Show show : dataManager.getShowInTheatre(cT.getId())) {
-				System.out.println("---"+show.toString());
-				
+				System.out.println("--- Movie:"+ dataManager.getMovie(show.getMovieId()).getName() + " " + show.toString());				
 			}
 			System.out.println("");
 		}

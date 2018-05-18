@@ -93,7 +93,7 @@ public class DataBaseHandler {
     }
     
     public Theatre getTheatreFromDb(String name) {
-    	Theatre theatreToFetch = new Theatre();
+    	Theatre theatreToFetch = null;
     	open();
         try {
             String query =
@@ -102,9 +102,11 @@ public class DataBaseHandler {
             Statement statement = conn.createStatement ();
             ResultSet rs = statement.executeQuery (query);
             
-            rs.next();       
-            theatreToFetch.setId(rs.getInt("id"));
-            theatreToFetch.setName(rs.getString("name"));  
+            if (rs.next()) {      
+            	theatreToFetch = new Theatre();
+            	theatreToFetch.setId(rs.getInt("id"));
+            	theatreToFetch.setName(rs.getString("name"));
+            }
         }  
        catch(SQLException e){
             System.out.println(e.getMessage());
@@ -346,14 +348,12 @@ public class DataBaseHandler {
             String query =	
             		//get all shows where starttime or endtime is within the new show
             		"SELECT * FROM show WHERE theatre_id = " + show.getTheatreId() + " and starttime "
-            		+ "between '" + show.getStart() + "' and '" + show.getEnd()+ "' or"
-            		+ " endtime between '"+  show.getStart() + "' and '" + show.getEnd() +"';";
+            		+ "between '" + show.getStart() + "' and '" + show.getEnd()+ "';";
             		
             Statement statement = conn.createStatement ();
-            
             ResultSet rs = statement.executeQuery (query);
             showOverlaps = rs.next();
-            
+           
        }  
        catch(SQLException e){
             System.out.println(e.getMessage());
@@ -362,11 +362,37 @@ public class DataBaseHandler {
             close();
         }
         if (checkIfShowEatsUp(show)) {
+        	
+        	showOverlaps = true;
+        }
+        if (checkEndtime(show)) {
         	showOverlaps = true;
         }
         return showOverlaps;    	
 	}
 	
+	private boolean checkEndtime(Show show) {
+		boolean showOverlaps = false;
+		open();
+        try {
+            String query =	
+            		//get all shows where starttime or endtime is within the new show
+            		"SELECT * FROM show WHERE theatre_id = " + show.getTheatreId() + " and endtime between '"
+            				+  show.getStart() + "' and '" + show.getEnd() +"';";
+            		
+            Statement statement = conn.createStatement ();
+            ResultSet rs = statement.executeQuery (query);
+            showOverlaps = rs.next();
+           
+       }  
+       catch(SQLException e){
+            System.out.println(e.getMessage());
+        } 
+        finally {
+            close();
+        }
+        return showOverlaps;
+	}
 	private boolean checkIfShowEatsUp(Show show) {
 		boolean showOverlaps = false;
 		open();
