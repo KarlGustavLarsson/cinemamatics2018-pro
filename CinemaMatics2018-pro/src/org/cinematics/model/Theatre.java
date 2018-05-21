@@ -8,8 +8,8 @@ import org.cinematics.handlers.DataBaseHandler;
 
 public class Theatre {
 	
-	public static int SEAT_ROWS = 5;
-	public static int SEAT_COLS = 10;
+	public static int SEAT_ROWS = 4;
+	public static int SEAT_COLS = 9;
 	private int id;
 	private String name;						
 												
