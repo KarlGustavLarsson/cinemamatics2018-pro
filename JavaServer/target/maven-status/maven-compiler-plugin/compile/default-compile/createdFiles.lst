@@ -1,0 +1,4 @@
+test\WebApplication.class
+test\database\IDataDAO.class
+test\Test.class
+test\database\TestRowMapper.class
